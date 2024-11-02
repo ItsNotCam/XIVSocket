@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace XIVSocket.Events.Listeners
+namespace XIVSocket.App.EventSystem.Listeners
 {
     internal class CharacterListener : IDisposable
     {
@@ -74,7 +74,7 @@ namespace XIVSocket.Events.Listeners
 
             if (lastJob != currentJob.RowId)
             {
-                Plugin.sock.SendMessageAsync($"Job change: Lvl: {lastLevel} {job!.Name} -> Lvl. {currentLevel} {currentJob.Name}");
+                Plugin.NetworkManager.SendMessage($"Job change: Lvl: {lastLevel} {job!.Name} -> Lvl. {currentLevel} {currentJob.Name}");
                 lastJob = (int)currentJob.RowId;
                 lastExp = currentExperience;
                 lastLevel = currentLevel;
@@ -88,10 +88,10 @@ namespace XIVSocket.Events.Listeners
                 var dir = delta > 0 ? "+" : "";
                 if (delta > 0)
                 {
-                    Plugin.sock.SendMessageAsync($"Lvl up! Lvl. {lastLevel} -> {currentLevel} {job.Name}");
+                    Plugin.NetworkManager.SendMessage($"Lvl up! Lvl. {lastLevel} -> {currentLevel} {job.Name}");
                 }
 
-                Plugin.sock.SendMessageAsync($"Lvl {currentLevel} {currentJob.Name} | Exp {dir}{delta} ({currentExperience})");
+                Plugin.NetworkManager.SendMessage($"Lvl {currentLevel} {currentJob.Name} | Exp {dir}{delta} ({currentExperience})");
                 lastLevel = currentLevel;
             }
 
@@ -101,14 +101,14 @@ namespace XIVSocket.Events.Listeners
             {
                 var delta = currentExperience - lastExp;
                 var dir = delta > 0 ? "+" : "";
-                Plugin.sock.SendMessageAsync($"Lvl {currentLevel} {currentJob.Name} | Exp {dir}{delta} ({currentExperience})");
+                Plugin.NetworkManager.SendMessage($"Lvl {currentLevel} {currentJob.Name} | Exp {dir}{delta} ({currentExperience})");
             }
             lastExp = currentExperience;
 
             var pos = GetCurrentPosition();
             if (!pos.Equals(lastPos))
             {
-                Plugin.sock.SendMessageAsync($"Moved! {lastPos.ToString()} -> {pos.ToString()}");
+                Plugin.NetworkManager.SendMessage($"Moved! {lastPos.ToString()} -> {pos.ToString()}");
                 lastPos = pos;
             }
         }

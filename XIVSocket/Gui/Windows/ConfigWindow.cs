@@ -3,7 +3,7 @@ using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 
-namespace XIVSocket.Windows;
+namespace XIVSocket.Gui.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
@@ -41,18 +41,20 @@ public class ConfigWindow : Window, IDisposable
     public override void Draw()
     {
         // can't ref a property, so use a local copy
-        var configValue = Configuration.SomePropertyToBeSavedAndWithADefault;
-        if (ImGui.Checkbox("Random Config Bool", ref configValue))
+        var openOnLaunch = Configuration.OpenOnLaunch;
+        if (ImGui.Checkbox("Open on Launch", ref openOnLaunch))
         {
-            Configuration.SomePropertyToBeSavedAndWithADefault = configValue;
+            Configuration.OpenOnLaunch = openOnLaunch;
             // can save immediately on change, if you don't want to provide a "Save and Close" button
             Configuration.Save();
         }
 
-        bool movable = Configuration.IsConfigWindowMovable;
-        if (ImGui.Checkbox("Movable Config Window", ref movable))
+        // can't ref a property, so use a local copy
+        var logToSocket = Configuration.TransmitLogsToSocket;
+        if (ImGui.Checkbox("Transmit Logs to Socket", ref logToSocket))
         {
-            Configuration.IsConfigWindowMovable = movable;
+            Configuration.TransmitLogsToSocket = logToSocket;
+            // can save immediately on change, if you don't want to provide a "Save and Close" button
             Configuration.Save();
         }
     }

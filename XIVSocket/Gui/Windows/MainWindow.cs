@@ -9,9 +9,8 @@ using System.Linq;
 
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.Generic;
-using XIVSocket.Network;
 
-namespace XIVSocket.Windows;
+namespace XIVSocket.Gui.Windows;
 
 public class MainWindow : Window, IDisposable
 {
@@ -23,7 +22,7 @@ public class MainWindow : Window, IDisposable
 
     private Lumina.Excel.ExcelSheet<Item> Items;
     private Lumina.Excel.ExcelSheet<Recipe> Recipes;
-    private Dictionary<uint,List<Recipe>> RecipesByResult;
+    private Dictionary<uint, List<Recipe>> RecipesByResult;
 
     private string itemInfo;
     private string itemName;
@@ -42,13 +41,16 @@ public class MainWindow : Window, IDisposable
         Items = Plugin.DataManager.GetExcelSheet<Item>()!;
 
         RecipesByResult = new Dictionary<uint, List<Recipe>>();
-        Lumina.Excel.ExcelSheet<Recipe> recipes = Plugin.DataManager.GetExcelSheet<Recipe>()!;
+        var recipes = Plugin.DataManager.GetExcelSheet<Recipe>()!;
         recipes.ToList().ForEach(recipe =>
         {
-            uint rowId = recipe.ItemResult.Row;
-            if (RecipesByResult.ContainsKey(rowId)) {
+            var rowId = recipe.ItemResult.Row;
+            if (RecipesByResult.ContainsKey(rowId))
+            {
                 RecipesByResult[rowId].Add(recipe);
-            } else {
+            }
+            else
+            {
                 RecipesByResult.Add(rowId, new List<Recipe>() { recipe });
             }
         });
@@ -79,28 +81,32 @@ public class MainWindow : Window, IDisposable
 
     void GetRecipeInfo(uint itemId, uint depth)
     {
-        if(depth > 10) {
+        if (depth > 10)
+        {
             itemInfo += "\nMaximum item depth exceeded";
             return;
         }
 
         List<Recipe> recipes = null;
-        if (!RecipesByResult.TryGetValue(itemId, out recipes)) {
+        if (!RecipesByResult.TryGetValue(itemId, out recipes))
+        {
             return;
         }
 
         var ingredients = recipes.First().UnkData5.Where(x => x.AmountIngredient > 0).ToList();
-        foreach(var ingredient in ingredients)
+        foreach (var ingredient in ingredients)
         {
-            uint ingredientId = (uint)ingredient.ItemIngredient;
+            var ingredientId = (uint)ingredient.ItemIngredient;
             int amount = ingredient.AmountIngredient;
             var row = Items.GetRow(ingredientId);
-            if (row == null) {
+            if (row == null)
+            {
                 continue;
             }
 
             string curItemName = row.Name;
-            for(int i = 0; i < depth; i++) {
+            for (var i = 0; i < depth; i++)
+            {
                 itemInfo += "\t";
             }
             itemInfo += amount + " " + curItemName + "\n";
@@ -111,10 +117,13 @@ public class MainWindow : Window, IDisposable
     void GetItemInfo()
     {
         Plugin.ChatGui.Print("Searching for " + searchItem);
-        Item? searchItemObj = Items.FirstOrDefault(i => i.Name.ToString().Equals(searchItem), null);
-        if(searchItemObj == null) {
+        var searchItemObj = Items.FirstOrDefault(i => i.Name.ToString().Equals(searchItem), null);
+        if (searchItemObj == null)
+        {
             Plugin.ChatGui.Print("No such item exists");
-        } else {
+        }
+        else
+        {
             Plugin.ChatGui.Print("found " + searchItemObj.Name);
 
             itemInfo = "";
@@ -125,21 +134,29 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        NetworkManager netMgr = Plugin.NetworkManager;
+        var netMgr = Plugin.NetworkManager;
 
-        if(ImGui.Button((netMgr.SocketRunning() ? "Stop" : "Start") + " Socket")) {
-            if (netMgr.SocketRunning()) {
+        if (ImGui.Button((netMgr.SocketRunning() ? "Stop" : "Start") + " Socket"))
+        {
+            if (netMgr.SocketRunning())
+            {
                 netMgr.StopSocket();
-            } else {
+            }
+            else
+            {
                 netMgr.StartSocket();
             }
         }
 
-        if(ImGui.Button("Get Location")) {
-            Plugin.GetClosestAetherite();
-        }
+        //if (ImGui.Button("Get Location"))
+        //{
+        //    Plugin.GetClosestAetherite();
+        //}
 
-        if (ImGui.Button("Show Settings")) {
+        ImGui.Text(Plugin.EventPoller.LocationPoller.Location.ToString());
+
+        if (ImGui.Button("Show Settings"))
+        {
             Plugin.ToggleConfigUI();
         }
 
@@ -160,7 +177,8 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        for (int i = 1; i < playerAttributeNames.Length; i++) {
+        for (var i = 1; i < playerAttributeNames.Length; i++)
+        {
             ImGui.Text(playerAttributeNames[i] + ": " + playerAttributes[i]);
         }
 
@@ -171,19 +189,26 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Search for an item");
         ImGui.InputText("", ref searchItem, 100);
 
-        if (ImGui.Button("Get the item")) {
+        if (ImGui.Button("Get the item"))
+        {
             GetItemInfo();
         }
 
-        if (itemName != null) {
+        if (itemName != null)
+        {
             ImGui.Text(itemName);
-        } else {
+        }
+        else
+        {
             ImGui.Text("No Item Name");
         }
 
-        if (itemInfo != null) {
+        if (itemInfo != null)
+        {
             ImGui.Text(itemInfo);
-        } else {
+        }
+        else
+        {
             ImGui.Text("No Item Info");
         }
     }

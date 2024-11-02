@@ -10,6 +10,7 @@ public class Configuration : IPluginConfiguration
 
     public bool IsConfigWindowMovable { get; set; } = true;
     public bool OpenOnLaunch { get; set; } = false;
+    public bool TransmitLogsToSocket { get; internal set; }
 
     // the below exist just to make saving less cumbersome
     public void Save()

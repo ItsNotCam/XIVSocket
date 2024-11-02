@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XIVSocket.Aetherite
+namespace XIVSocket.App.Aetherite
 {
     using System;
     using FFXIVClientStructs.FFXIV.Client.Game.UI;
-    using XIVSocket.Aetherite.Managers;
+    using XIVSocket.App.Aetherite.Managers;
 
     public class TeleportAlias : IEquatable<TeleportAlias>, IEquatable<TeleportInfo>
     {

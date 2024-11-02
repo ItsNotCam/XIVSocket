@@ -3,14 +3,13 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using XIVSocket.Windows;
 using System.IO;
-using XIVSocket.Network;
-using Dalamud.Game.Network.Structures.InfoProxy;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
-using XIVSocket.Aetherite.Managers;
-using XIVSocket.Dispatchers.Listeners;
+using XIVSocket.Gui.Windows;
+using XIVSocket.App.Network;
+using XIVSocket.App.EventSystem;
+using XIVSocket.App.Logging;
+using XIVSocket.App.EventSystem.Listeners;
+using XIVSocket.App.EventSystem.Events;
 
 
 /*
@@ -60,27 +59,29 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
-    /* Listeners */
-    //private CharacterListener InventoryListener { get; init; }
-
     /* Network */
-    public NetworkManager NetworkManager { get; private set; } = null;
+    public NetworkManager NetworkManager { get; }
+
+    /* Events */
+    public EventManager EventManager { get; }
+    public EventPoller EventPoller { get; }
+
+    public Logger Logger { get; }
 
     public Plugin()
     {
+        /* Configuration */
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         // you might normally want to embed resources and load them from the manifest stream
         string goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "OhGod.png");
 
+        /* Register Windows */
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this, goatImagePath);
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
-
-        //InventoryListener = new CharacterListener(this);//, framework, dataManager, clientState);
-        //InventoryListener.Start();
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand) {
             HelpMessage = "A useful message to display in /xlhelp"
@@ -94,11 +95,34 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button that is doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
-        AetheryteManager.Load();
+
+        /*******************/
+        /*     MY SHIT    */
+        /*******************/
+
+        /* Network */
+        NetworkManager = new NetworkManager();
         NetworkManager.StartSocket();
 
-        // always open on start
-        if(Configuration.OpenOnLaunch) {
+        /* Logging */
+        Logger = new Logger(NetworkManager, Configuration.TransmitLogsToSocket);
+
+        /* Events */
+        EventManager = new EventManager(this);
+        EventManager.RegisterListener(new PlayerMoveListener(this));
+        EventManager.RegisterListener(new PlayerChangeAreaListener(this));
+        EventManager.RegisterListener(new PlayerChangeRegionListener(this));
+        EventManager.RegisterListener(new PlayerChangeSubAreaListener(this));
+        EventManager.RegisterListener(new PlayerChangeTerritoryListener(this));
+
+        EventPoller = new EventPoller(EventManager);
+        EventPoller.Start();
+
+        /**********/
+        /* FINITO */
+        /**********/
+
+        if (Configuration.OpenOnLaunch) {
             ToggleMainUI();
         }
     }
@@ -112,8 +136,9 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(CommandName);
 
-        StopSocket();
-        //InventoryListener.Dispose();
+        NetworkManager.Dispose();
+        EventManager.Dispose();
+        EventPoller.Dispose();
     }
 
     private void OnCommand(string command, string args) {
@@ -125,30 +150,30 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
 
-    public void GetClosestAetherite() {
-        uint worldId = ClientState.LocalPlayer!.CurrentWorld.Id;
-        World world = DataManager.GetExcelSheet<World>()!.GetRow(worldId)!;
+    //public void GetClosestAetherite() {
+    //    uint worldId = ClientState.LocalPlayer!.CurrentWorld.Id;
+    //    World world = DataManager.GetExcelSheet<World>()!.GetRow(worldId)!;
 
-        uint mapId = ClientState.MapId;
-        Lumina.Excel.GeneratedSheets.Map map = DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Map>()!.GetRow(mapId)!;
-        uint regionId = map.PlaceNameRegion.Row;
-        uint placeId = map.PlaceName.Row;
+    //    uint mapId = ClientState.MapId;
+    //    Lumina.Excel.GeneratedSheets.Map map = DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Map>()!.GetRow(mapId)!;
+    //    uint regionId = map.PlaceNameRegion.Row;
+    //    uint placeId = map.PlaceName.Row;
 
-        PlaceName place = DataManager.GetExcelSheet<PlaceName>()!.GetRow(regionId)!;
-        PlaceName place2 = DataManager.GetExcelSheet<PlaceName>()!.GetRow(placeId)!;
+    //    PlaceName place = DataManager.GetExcelSheet<PlaceName>()!.GetRow(regionId)!;
+    //    PlaceName place2 = DataManager.GetExcelSheet<PlaceName>()!.GetRow(placeId)!;
 
-        AetheryteManager.TryFindAetheryteByMapName(
-            place2.Name, true, out TeleportInfo info
-        );
+    //    AetheryteManager.TryFindAetheryteByMapName(
+    //        place2.Name, true, out TeleportInfo info
+    //    );
 
-        AetheryteManager.AvailableAetherytes.ForEach(ad => {
-            uint aetheryteId = ad.AetheryteId;
-            Aetheryte a = DataManager.GetExcelSheet<Aetheryte>().GetRow(aetheryteId);
-            string nodeName = a.PlaceName.Value.NameNoArticle;
-            string message = $"{world.Name} | {place.Name} @ {place2.Name} | closest: {nodeName}";
-
-            sock.SendMessageAsync(message);
-            PluginLogger.Debug(message);
-        });
-    }
+    //    AetheryteManager.AvailableAetherytes.ForEach(ad => {
+    //        uint aetheryteId = ad.AetheryteId;
+    //        Aetheryte a = DataManager.GetExcelSheet<Aetheryte>().GetRow(aetheryteId);
+    //        string nodeName = a.PlaceName.Value.NameNoArticle;
+    //        string message = $"{world.Name} | {place.Name} @ {place2.Name} | closest: {nodeName}";
+            
+    //        NetworkManager.SendMessage(message);
+    //        PluginLogger.Debug(message);
+    //    });
+    //}
 }

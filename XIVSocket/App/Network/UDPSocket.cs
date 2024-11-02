@@ -4,9 +4,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using XIVSocket.Network.Models;
 
-namespace XIVSocket.Network;
+namespace XIVSocket.App.Network;
 
 public class UDPSocket : IDisposable
 {
@@ -30,10 +29,13 @@ public class UDPSocket : IDisposable
 
     public async void Start()
     {
-        try {
+        try
+        {
             recvTask = ReceiveMessagesAsync(cnclTokenSrc.Token);
             await recvTask;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Plugin.PluginLogger.Error("Error opening socket " + ex.Message);
         }
     }
@@ -49,7 +51,8 @@ public class UDPSocket : IDisposable
         {
             Plugin.PluginLogger.Debug($"Socket open at: {IPAddress.Any.ToString()}:{incomingPort} and waiting for messages...");
 
-            try {
+            try
+            {
                 while (!token.IsCancellationRequested)
                 {
                     var receivedResult = await udpClient.ReceiveAsync(cnclTokenSrc.Token);
@@ -60,22 +63,29 @@ public class UDPSocket : IDisposable
                     Plugin.ChatGui.Print($"[XIVSocket] {friendlyMessage}");
 
 
-                    if (receivedMessage.Contains("respond")) {
+                    if (receivedMessage.Contains("respond"))
+                    {
                         await SendMessageAsync(receivedMessage);
                     }
                 }
-            } catch (ObjectDisposedException) {
+            }
+            catch (ObjectDisposedException)
+            {
                 Plugin.PluginLogger.Debug("Socket closed gracefully.");
-            } catch (Exception ex) when (token.IsCancellationRequested) {
+            }
+            catch (Exception ex) when (token.IsCancellationRequested)
+            {
                 Plugin.PluginLogger.Debug($"Operation canceled: {ex.Message}");
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Plugin.PluginLogger.Error($"Unexpected error: {ex.Message}");
             }
         }
     }
 
 
-    public async Task SendMessageAsync(string message, bool isEcho=false)
+    public async Task SendMessageAsync(string message, bool isEcho = false)
     {
         var port = isEcho ? incomingPort : outgoingPort;
         using (var udpClient = new UdpClient(outgoingPort))
@@ -89,13 +99,18 @@ public class UDPSocket : IDisposable
     public async void Dispose()
     {
         Plugin.PluginLogger.Debug("Socket closing ... ");
-        try {
+        try
+        {
             cnclTokenSrc.Cancel();
             await recvTask;
             Plugin.PluginLogger.Debug("Socket closed");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Plugin.PluginLogger.Error("Socket failed to close: " + ex.Message);
-        } finally {
+        }
+        finally
+        {
             cnclTokenSrc.Dispose();
         }
     }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XIVSocket.Events
+namespace XIVSocket.App.EventSystem.Events
 {
-    internal class EventManager
+    public class GameEvent
     {
     }
 }
