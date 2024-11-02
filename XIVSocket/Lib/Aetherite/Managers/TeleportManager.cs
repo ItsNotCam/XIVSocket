@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lumina.Excel.GeneratedSheets;
-using XIVSocket.App.Aetherite;
+using XIVSocket.Lib.Aetherite;
 
-namespace XIVSocket.App.Aetherite.Managers
+namespace XIVSocket.Lib.Aetherite.Managers
 {
     public static unsafe class TeleportManager
     {

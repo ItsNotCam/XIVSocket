@@ -26,7 +26,17 @@ namespace XIVSocket.App.Network
             }
             else
             {
-                sock.Start();
+                Plugin.PluginLogger.Debug("Starting Socket");
+                try
+                {
+                    sock.Start();
+                    Plugin.PluginLogger.Debug("Started Socket");
+                }
+                catch (Exception e)
+                {
+                    Plugin.PluginLogger.Error($"Could not start socket {e.Message}");
+                }
+                
             }
         }
 
@@ -49,13 +59,15 @@ namespace XIVSocket.App.Network
 
         public void SendMessage(string message)
         {
-            sock.SendMessageAsync(message).ContinueWith(t =>
+            sock.SendMessageAsync(message);
+                
+                /*.ContinueWith(t =>
             {
                 if (t.Exception != null)
                 {
                     Plugin.PluginLogger.Error($"Failed to send message {t.Exception}");
                 }
-            }, TaskContinuationOptions.OnlyOnFaulted);
+            }, TaskContinuationOptions.OnlyOnFaulted);*/
         }
 
         public void Dispose()

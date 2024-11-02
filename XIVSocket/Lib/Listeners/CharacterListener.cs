@@ -1,21 +1,15 @@
 using Dalamud.Game.Network.Structures.InfoProxy;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using Lumina.Excel.GeneratedSheets;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace XIVSocket.App.EventSystem.Listeners
+namespace XIVSocket.Lib.Listeners
 {
-    internal class CharacterListener : IDisposable
+    internal class CharacterListener : IEventListener
     {
         private Plugin Plugin;
         private System.Threading.Tasks.Task TickTask;

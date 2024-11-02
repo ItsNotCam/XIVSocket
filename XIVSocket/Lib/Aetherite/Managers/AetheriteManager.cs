@@ -8,9 +8,9 @@ using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using Lumina.Excel.GeneratedSheets;
-using XIVSocket.App.Aetherite;
+using XIVSocket.Lib.Aetherite;
 
-namespace XIVSocket.App.Aetherite.Managers
+namespace XIVSocket.Lib.Aetherite.Managers
 {
     public static class AetheryteManager
     {

@@ -148,12 +148,15 @@ public class MainWindow : Window, IDisposable
             }
         }
 
-        //if (ImGui.Button("Get Location"))
-        //{
-        //    Plugin.GetClosestAetherite();
-        //}
-
-        ImGui.Text(Plugin.EventPoller.LocationPoller.Location.ToString());
+        string[] txt = [
+            Plugin.location.region.name, 
+            Plugin.location.territory.name, 
+            Plugin.location.area.name, 
+            Plugin.location.subArea.name
+        ];
+        ImGui.Text(string.Join(", ", txt.ToList()));
+        ImGui.Spacing();
+        ImGui.Text(Plugin.location.ToString());
 
         if (ImGui.Button("Show Settings"))
         {

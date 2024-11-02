@@ -6,11 +6,14 @@ using Dalamud.Plugin.Services;
 using System.IO;
 using XIVSocket.Gui.Windows;
 using XIVSocket.App.Network;
-using XIVSocket.App.EventSystem;
+//using XIVSocket.App.EventSystem;
 using XIVSocket.App.Logging;
-using XIVSocket.App.EventSystem.Listeners;
-using XIVSocket.App.EventSystem.Events;
+//using XIVSocket.App.EventSystem.Listeners;
+//using XIVSocket.App.EventSystem.Events;
 
+using XIVEvents;
+using XIVSocket.Lib.Listeners;
+using XIVEvents.Models;
 
 /*
  * 
@@ -32,7 +35,6 @@ also has ExpNeededExperience and ExpRestedExperience, as well as ExpClassJobId
 
 PlayerState.Instance()->ClassJobExperience
  */
-
 
 
 namespace XIVSocket;
@@ -59,6 +61,8 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
+    // ok
+
     /* Network */
     public NetworkManager NetworkManager { get; }
 
@@ -66,10 +70,15 @@ public sealed class Plugin : IDalamudPlugin
     public EventManager EventManager { get; }
     public EventPoller EventPoller { get; }
 
+    /* State */
+    public LocationModel location;
+
     public Logger Logger { get; }
 
-    public Plugin()
+    public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        pluginInterface.Create<Services>();
+
         /* Configuration */
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
@@ -88,7 +97,7 @@ public sealed class Plugin : IDalamudPlugin
         });
         PluginInterface.UiBuilder.Draw += DrawUI;
 
-        // This adds a button to the plugin installer entry of this plugin which allows
+        // This adds a button to the plugin installer entry ofw this plugin which allows
         // to toggle the display status of the configuration ui
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
@@ -105,22 +114,21 @@ public sealed class Plugin : IDalamudPlugin
         NetworkManager.StartSocket();
 
         /* Logging */
-        Logger = new Logger(NetworkManager, Configuration.TransmitLogsToSocket);
+        //Logger = new Logger(NetworkManager, Configuration.TransmitLogsToSocket);
 
         /* Events */
-        EventManager = new EventManager(this);
-        EventManager.RegisterListener(new PlayerMoveListener(this));
-        EventManager.RegisterListener(new PlayerChangeAreaListener(this));
-        EventManager.RegisterListener(new PlayerChangeRegionListener(this));
-        EventManager.RegisterListener(new PlayerChangeSubAreaListener(this));
-        EventManager.RegisterListener(new PlayerChangeTerritoryListener(this));
+        EventManager = new EventManager();
+        EventManager.RegisterListeners(new PlayerMoveListener(this));
 
         EventPoller = new EventPoller(EventManager);
         EventPoller.Start();
 
         /**********/
         /* FINITO */
-        /**********/
+        /***********/
+
+        /* State */
+        location = new LocationModel();
 
         if (Configuration.OpenOnLaunch) {
             ToggleMainUI();
@@ -136,9 +144,10 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(CommandName);
 
-        NetworkManager.Dispose();
-        EventManager.Dispose();
-        EventPoller.Dispose();
+        if(NetworkManager != null) {
+            NetworkManager.Dispose();
+        }
+        //EventManager.Dispose();
     }
 
     private void OnCommand(string command, string args) {
