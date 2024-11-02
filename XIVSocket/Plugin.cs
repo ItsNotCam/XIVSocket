@@ -10,7 +10,6 @@ using XIVSocket.App.Network;
 using XIVSocket.App.Logging;
 //using XIVSocket.App.EventSystem.Listeners;
 //using XIVSocket.App.EventSystem.Events;
-
 using XIVEvents;
 using XIVSocket.Lib.Listeners;
 using XIVEvents.Models;
