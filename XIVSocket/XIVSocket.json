@@ -1,0 +1,12 @@
+{
+    "Author": "Cam",
+    "Name": "XIVSocket",
+    "Punchline": "A short one-liner that shows up in /xivsocket.",
+    "Description": "A description that shows up in /xivsocket. List any major slash-command(s).",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "sample",
+        "plugin",
+        "socket"
+    ]
+}

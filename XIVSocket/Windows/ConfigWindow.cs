@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 
-namespace SamplePlugin.Windows;
+namespace XIVSocket.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
@@ -49,7 +49,7 @@ public class ConfigWindow : Window, IDisposable
             Configuration.Save();
         }
 
-        var movable = Configuration.IsConfigWindowMovable;
+        bool movable = Configuration.IsConfigWindowMovable;
         if (ImGui.Checkbox("Movable Config Window", ref movable))
         {
             Configuration.IsConfigWindowMovable = movable;
