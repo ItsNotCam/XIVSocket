@@ -35,12 +35,8 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
-    // ok
-
-    /* Network */
     public NetworkManager NetworkManager { get; }
     public GameManager GameManager { get; }
-    
     public Logger Logger { get; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
@@ -81,9 +77,6 @@ public sealed class Plugin : IDalamudPlugin
         NetworkManager = new NetworkManager();
         NetworkManager.StartSocket();
 
-        /* Logging */
-        //Logger = new Logger(NetworkManager, Configuration.TransmitLogsToSocket);
-
         /* Events */
         GameManager = new GameManager();
         GameManager.RegisterListeners(new PlayerMoveListener(this));
@@ -110,9 +103,8 @@ public sealed class Plugin : IDalamudPlugin
         GameManager.Dispose();
     }
 
-    private void OnCommand(string command, string args) {
-        ToggleMainUI();
-    }
+    private void OnCommand(string command, string args) => ToggleMainUI();
+  
 
     private void DrawUI() => WindowSystem.Draw();
     public void ToggleConfigUI() => ConfigWindow.Toggle();

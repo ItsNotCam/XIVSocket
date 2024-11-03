@@ -7,7 +7,7 @@ using XIVEvents.Pollers;
 
 namespace XIVSocket.Lib.Listeners;
 
-internal class PlayerMoveListener : Listener
+internal class PlayerMoveListener : IListener
 {
     Plugin plugin;
     //private static Mutex mut = new Mutex();

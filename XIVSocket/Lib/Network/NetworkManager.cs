@@ -5,22 +5,22 @@ namespace XIVSocket.App.Network
 {
     public class NetworkManager : IDisposable
     {
-        internal UDPSocket sock { get; } = null!;
+        internal UDPSocket udpSock { get; } = null!;
 
         public NetworkManager()
         {
-            sock = new UDPSocket(27000, "127.0.0.1", 27001, "127.0.0.1");
+            udpSock = new UDPSocket(27000, "127.0.0.1", 27001, "127.0.0.1");
         }
 
         public void StartSocket()
         {
-            if (sock == null)
+            if (udpSock == null)
             {
                 Plugin.PluginLogger.Error("Socket cannot start - it has not been initialized");
                 return;
             }
 
-            if (sock.isRunning())
+            if (udpSock.isRunning())
             {
                 Plugin.PluginLogger.Error("Socket already running.");
             }
@@ -29,7 +29,7 @@ namespace XIVSocket.App.Network
                 Plugin.PluginLogger.Debug("Starting Socket");
                 try
                 {
-                    sock.Start();
+                    udpSock.Start();
                     Plugin.PluginLogger.Debug("Started Socket");
                 }
                 catch (Exception e)
@@ -42,9 +42,9 @@ namespace XIVSocket.App.Network
 
         public void StopSocket()
         {
-            if (sock != null && sock.isRunning())
+            if (udpSock != null && udpSock.isRunning())
             {
-                sock.Dispose();
+                udpSock.Dispose();
             }
             else
             {
@@ -54,12 +54,12 @@ namespace XIVSocket.App.Network
 
         public bool SocketRunning()
         {
-            return sock != null && sock.isRunning();
+            return udpSock != null && udpSock.isRunning();
         }
 
         public void SendUdpMessage(string message)
         {
-            _ = sock.SendMessageAsync(message);
+            _ = udpSock.SendMessageAsync(message);
         }
 
         public void Dispose()
