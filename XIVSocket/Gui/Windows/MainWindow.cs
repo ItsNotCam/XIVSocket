@@ -135,12 +135,11 @@ public class MainWindow : Window, IDisposable
     public override void Draw()
     {
         var netMgr = Plugin.NetworkManager;
-
         if (ImGui.Button((netMgr.SocketRunning() ? "Stop" : "Start") + " Socket"))
         {
             if (netMgr.SocketRunning())
             {
-                netMgr.StopSocket();
+                netMgr.Dispose();
             }
             else
             {
@@ -149,14 +148,14 @@ public class MainWindow : Window, IDisposable
         }
 
         string[] txt = [
-            Plugin.location.region.name, 
-            Plugin.location.territory.name, 
-            Plugin.location.area.name, 
-            Plugin.location.subArea.name
+            Plugin.GameManager.GetLocation().region.name,
+            Plugin.GameManager.GetLocation().territory.name,
+            Plugin.GameManager.GetLocation().area.name,
+            Plugin.GameManager.GetLocation().subArea.name
         ];
         ImGui.Text(string.Join(", ", txt.ToList()));
         ImGui.Spacing();
-        ImGui.Text(Plugin.location.ToString());
+        ImGui.Text(Plugin.GameManager.GetLocation().ToString());
 
         if (ImGui.Button("Show Settings"))
         {

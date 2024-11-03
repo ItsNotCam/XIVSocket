@@ -1,4 +1,5 @@
 //using System.Threading;
+using Windows.UI.ApplicationSettings;
 using XIVEvents;
 using XIVEvents.Events.Location;
 using XIVEvents.Models;
@@ -15,21 +16,11 @@ internal class PlayerMoveListener : Listener
         this.plugin = plugin;
     }
 
-    public void SetLocation(LocationModel location)
-    {
-        //mut.WaitOne();
-        plugin.location = location;
-        //mut.ReleaseMutex();
-    }
-
     [EventListener]
     public void OnPlayerMove(PlayerMoveEvent e)
     {
         var message = $"M: {e.OldLocation.Position.ToString()} -> {e.NewLocation.Position.ToString()}";
         Plugin.PluginLogger.Verbose(message);
-        //plugin.NetworkManager.SendMessage(message);
-
-        SetLocation(e.NewLocation);
     }
 
     [EventListener]
@@ -48,9 +39,7 @@ internal class PlayerMoveListener : Listener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendMessage(message);
-
-        SetLocation(e.NewLocation);
+        plugin.NetworkManager.SendUdpMessage(message);
     }
 
     [EventListener]
@@ -69,9 +58,7 @@ internal class PlayerMoveListener : Listener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendMessage(message);
-
-        SetLocation(e.NewLocation);
+        plugin.NetworkManager.SendUdpMessage(message);
     }
 
     [EventListener]
@@ -90,9 +77,7 @@ internal class PlayerMoveListener : Listener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendMessage(message);
-
-        SetLocation(e.NewLocation);
+        plugin.NetworkManager.SendUdpMessage(message);
     }
 
     [EventListener]
@@ -111,8 +96,6 @@ internal class PlayerMoveListener : Listener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendMessage(message);
-
-        SetLocation(e.NewLocation);
+        plugin.NetworkManager.SendUdpMessage(message);
     }
 }

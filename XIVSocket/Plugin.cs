@@ -6,35 +6,10 @@ using Dalamud.Plugin.Services;
 using System.IO;
 using XIVSocket.Gui.Windows;
 using XIVSocket.App.Network;
-//using XIVSocket.App.EventSystem;
 using XIVSocket.App.Logging;
-//using XIVSocket.App.EventSystem.Listeners;
-//using XIVSocket.App.EventSystem.Events;
 using XIVEvents;
 using XIVSocket.Lib.Listeners;
 using XIVEvents.Models;
-
-/*
- * 
- * public int GetCurrentExperience()
-{
-    var playerState = PlayerState.Instance();
-    if (playerState->IsLoaded == 0)
-        return 0;
-
-    var classJobId = playerState->CurrentClassJobId;
-    var classJobRow = dataManager.GetExcelSheet<ClassJob>()!.GetRow(classJobId);
-    var currentExperience = playerState->ClassJobExperience[classJobRow.ExpArrayIndex];
-    return currentExperience;
-}
- * yeah, you can use the IFramework service and listen to the Update event. it runs every frame
- * 
- * you can also get the experience from the exp bar via AgentHUD.Instance()->ExpCurrentExperience
-also has ExpNeededExperience and ExpRestedExperience, as well as ExpClassJobId
-
-PlayerState.Instance()->ClassJobExperience
- */
-
 
 namespace XIVSocket;
 
@@ -64,14 +39,8 @@ public sealed class Plugin : IDalamudPlugin
 
     /* Network */
     public NetworkManager NetworkManager { get; }
-
-    /* Events */
-    public EventManager EventManager { get; }
-    public EventPoller EventPoller { get; }
-
-    /* State */
-    public LocationModel location;
-
+    public GameManager GameManager { get; }
+    
     public Logger Logger { get; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
@@ -116,19 +85,13 @@ public sealed class Plugin : IDalamudPlugin
         //Logger = new Logger(NetworkManager, Configuration.TransmitLogsToSocket);
 
         /* Events */
-        EventManager = new EventManager();
-        EventManager.RegisterListeners(new PlayerMoveListener(this));
-
-        EventPoller = new EventPoller(EventManager);
-        EventPoller.Start();
+        GameManager = new GameManager();
+        GameManager.RegisterListeners(new PlayerMoveListener(this));
+        GameManager.Listen();
 
         /**********/
         /* FINITO */
         /***********/
-
-        /* State */
-        location = new LocationModel();
-
         if (Configuration.OpenOnLaunch) {
             ToggleMainUI();
         }
@@ -143,45 +106,15 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(CommandName);
 
-        if(NetworkManager != null) {
-            NetworkManager.Dispose();
-        }
-        //EventManager.Dispose();
+        NetworkManager.Dispose();
+        GameManager.Dispose();
     }
 
     private void OnCommand(string command, string args) {
-        // in response to the slash command, just toggle the display status of our main ui
         ToggleMainUI();
     }
 
     private void DrawUI() => WindowSystem.Draw();
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
-
-    //public void GetClosestAetherite() {
-    //    uint worldId = ClientState.LocalPlayer!.CurrentWorld.Id;
-    //    World world = DataManager.GetExcelSheet<World>()!.GetRow(worldId)!;
-
-    //    uint mapId = ClientState.MapId;
-    //    Lumina.Excel.GeneratedSheets.Map map = DataManager.GetExcelSheet<Lumina.Excel.GeneratedSheets.Map>()!.GetRow(mapId)!;
-    //    uint regionId = map.PlaceNameRegion.Row;
-    //    uint placeId = map.PlaceName.Row;
-
-    //    PlaceName place = DataManager.GetExcelSheet<PlaceName>()!.GetRow(regionId)!;
-    //    PlaceName place2 = DataManager.GetExcelSheet<PlaceName>()!.GetRow(placeId)!;
-
-    //    AetheryteManager.TryFindAetheryteByMapName(
-    //        place2.Name, true, out TeleportInfo info
-    //    );
-
-    //    AetheryteManager.AvailableAetherytes.ForEach(ad => {
-    //        uint aetheryteId = ad.AetheryteId;
-    //        Aetheryte a = DataManager.GetExcelSheet<Aetheryte>().GetRow(aetheryteId);
-    //        string nodeName = a.PlaceName.Value.NameNoArticle;
-    //        string message = $"{world.Name} | {place.Name} @ {place2.Name} | closest: {nodeName}";
-            
-    //        NetworkManager.SendMessage(message);
-    //        PluginLogger.Debug(message);
-    //    });
-    //}
 }

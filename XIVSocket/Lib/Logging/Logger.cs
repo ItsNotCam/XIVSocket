@@ -52,7 +52,7 @@ namespace XIVSocket.App.Logging
             }
 
             if (transmitToSocket && logLevel != LogLevel.VERBOSE) {
-                networkManager.SendMessage($"[{logLevel.ToString()}] {message}");
+                networkManager.SendUdpMessage($"[{logLevel.ToString()}] {message}");
             }
         }
     }

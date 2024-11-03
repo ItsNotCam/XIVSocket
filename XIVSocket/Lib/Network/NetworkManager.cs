@@ -57,17 +57,9 @@ namespace XIVSocket.App.Network
             return sock != null && sock.isRunning();
         }
 
-        public void SendMessage(string message)
+        public void SendUdpMessage(string message)
         {
-            sock.SendMessageAsync(message);
-                
-                /*.ContinueWith(t =>
-            {
-                if (t.Exception != null)
-                {
-                    Plugin.PluginLogger.Error($"Failed to send message {t.Exception}");
-                }
-            }, TaskContinuationOptions.OnlyOnFaulted);*/
+            _ = sock.SendMessageAsync(message);
         }
 
         public void Dispose()

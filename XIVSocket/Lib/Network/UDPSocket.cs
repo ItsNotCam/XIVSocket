@@ -104,6 +104,7 @@ public class UDPSocket : IDisposable
             cnclTokenSrc.Cancel();
             await recvTask;
             Plugin.PluginLogger.Debug("Socket closed");
+            recvTask = null;
         }
         catch (Exception ex)
         {
