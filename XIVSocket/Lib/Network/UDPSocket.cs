@@ -31,8 +31,8 @@ public class UDPSocket : IDisposable
     {
         try
         {
-            recvTask = ReceiveMessagesAsync(cnclTokenSrc.Token);
-            await recvTask;
+            //recvTask = ReceiveMessagesAsync(cnclTokenSrc.Token);
+            //await recvTask;
         }
         catch (Exception ex)
         {
@@ -65,7 +65,7 @@ public class UDPSocket : IDisposable
 
                     if (receivedMessage.Contains("respond"))
                     {
-                        await SendMessageAsync(receivedMessage);
+                        SendMessageAsync(receivedMessage);
                     }
                 }
             }
@@ -85,14 +85,20 @@ public class UDPSocket : IDisposable
     }
 
 
-    public async Task SendMessageAsync(string message, bool isEcho = false)
+    public void SendMessageAsync(string message, bool isEcho = false)
     {
         var port = isEcho ? incomingPort : outgoingPort;
         using (var udpClient = new UdpClient(outgoingPort))
         {
             var data = Encoding.UTF8.GetBytes(message);
-            await udpClient.SendAsync(data, data.Length, outgoingHost, port);
-            Console.WriteLine($"Send: {message}");
+            var _ = udpClient.SendAsync(data, data.Length, outgoingHost, port);
+        }
+    }
+
+    public void SendBytesAsync(byte[] data)
+    {
+        using (var udpClient = new UdpClient(outgoingPort)) {
+            var _ = udpClient.SendAsync(data, data.Length, outgoingHost, outgoingPort);
         }
     }
 

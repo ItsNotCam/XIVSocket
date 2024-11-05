@@ -19,8 +19,11 @@ internal class PlayerMoveListener : IListener
     [EventListener]
     public void OnPlayerMove(PlayerMoveEvent e)
     {
-        var message = $"M: {e.OldLocation.Position.ToString()} -> {e.NewLocation.Position.ToString()}";
+        var message = $"M: {e.NewLocation.position.ToString()}";
         Plugin.PluginLogger.Verbose(message);
+        //plugin.NetworkManager.SendUdpMessage(message);
+
+        plugin.NetworkManager.SendMovementMessage(e.NewLocation);
     }
 
     [EventListener]
@@ -39,7 +42,9 @@ internal class PlayerMoveListener : IListener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendUdpMessage(message);
+        //plugin.NetworkManager.SendUdpMessage(message);
+
+        //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
     }
 
     [EventListener]
@@ -58,7 +63,9 @@ internal class PlayerMoveListener : IListener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendUdpMessage(message);
+        //plugin.NetworkManager.SendUdpMessage(message);
+
+        //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
     }
 
     [EventListener]
@@ -77,7 +84,9 @@ internal class PlayerMoveListener : IListener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendUdpMessage(message);
+        //plugin.NetworkManager.SendUdpMessage(message);
+
+        //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
     }
 
     [EventListener]
@@ -96,6 +105,8 @@ internal class PlayerMoveListener : IListener
         }
 
         Plugin.PluginLogger.Info(message);
-        plugin.NetworkManager.SendUdpMessage(message);
+        //plugin.NetworkManager.SendUdpMessage(message);
+
+        //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
     }
 }

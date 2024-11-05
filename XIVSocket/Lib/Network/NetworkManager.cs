@@ -1,5 +1,9 @@
+using Dalamud.Utility;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using XIVEvents.Models;
+using XIVSocket.Lib.Network.EzProto;
 
 namespace XIVSocket.App.Network
 {
@@ -11,6 +15,20 @@ namespace XIVSocket.App.Network
         {
             udpSock = new UDPSocket(27000, "127.0.0.1", 27001, "127.0.0.1");
         }
+
+        //public void RunEcho()
+        //{
+        //    // createa a new task that runs an echo to port 27001 every 1 second
+        //    Task.Run(async () =>
+        //    {
+        //        while (true)
+        //        {
+        //            SendUdpMessage("Echo");
+        //            await Task.Delay(1000);
+        //        }
+        //    });
+        //}
+
 
         public void StartSocket()
         {
@@ -59,7 +77,24 @@ namespace XIVSocket.App.Network
 
         public void SendUdpMessage(string message)
         {
-            _ = udpSock.SendMessageAsync(message);
+            udpSock.SendMessageAsync(message);
+        }
+
+        public void SendMovementMessage(LocationModel location) {
+            float x = location.position.X;
+            //float y = location.position.Y;
+            float z = location.position.Z;
+
+            //byte[] data = new byte[13];
+            byte[] data = new byte[9];
+            data[0] = 0x01;
+
+            BitConverter.GetBytes(x).CopyTo(data, 1);
+            //BitConverter.GetBytes(y).CopyTo(data, 5););
+            BitConverter.GetBytes(z).CopyTo(data, 5);
+            //BitConverter.GetBytes(z).CopyTo(data, 9);
+
+            udpSock.SendBytesAsync(data);
         }
 
         public void Dispose()

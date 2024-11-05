@@ -77,6 +77,8 @@ public sealed class Plugin : IDalamudPlugin
         NetworkManager = new NetworkManager();
         NetworkManager.StartSocket();
 
+        //NetworkManager.RunEcho();
+
         /* Events */
         GameManager = new GameManager();
         GameManager.RegisterListeners(new PlayerMoveListener(this));
