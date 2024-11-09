@@ -75,7 +75,6 @@ public sealed class Plugin : IDalamudPlugin
 
         /* Network */
         NetworkManager = new NetworkManager();
-        NetworkManager.StartSocket();
 
         //NetworkManager.RunEcho();
 

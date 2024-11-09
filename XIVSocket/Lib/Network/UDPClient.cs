@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace XIVSocket.App.Network;
 
-public class UDPSocket : IDisposable
+public class UDPClient : IDisposable
 {
     private int incomingPort;// Port to listen for incoming messages
     private string incomingHost;// Port to listen for incoming messages
@@ -17,32 +17,46 @@ public class UDPSocket : IDisposable
     private Task recvTask;
     private CancellationTokenSource cnclTokenSrc;
 
-    public UDPSocket(int incomingPort, string incomingHost, int outgoingPort, string outgoingHost)
+    public UDPClient(int outgoingPort)
     {
-        this.incomingPort = incomingPort;
-        this.incomingHost = incomingHost;
-        this.outgoingHost = outgoingHost;
         this.outgoingPort = outgoingPort;
-
         cnclTokenSrc = new CancellationTokenSource();
     }
-
-    public async void Start()
+    public void SendMessageAsync(string message, bool isEcho = false)
     {
+        var port = isEcho ? incomingPort : outgoingPort;
+        using (var udpClient = new UdpClient(outgoingPort))
+        {
+            var data = Encoding.UTF8.GetBytes(message);
+            var _ = udpClient.SendAsync(data, data.Length, outgoingHost, port);
+        }
+    }
+
+    public void SendBytesAsync(byte[] data)
+    {
+        using (var udpClient = new UdpClient(outgoingPort)) {
+            udpClient.SendAsync(data, data.Length, outgoingHost, outgoingPort);
+        }
+    }
+
+    public async void Dispose()
+    {
+        Plugin.PluginLogger.Debug("Socket closing ... ");
         try
         {
-            //recvTask = ReceiveMessagesAsync(cnclTokenSrc.Token);
-            //await recvTask;
+            cnclTokenSrc.Cancel();
+            await recvTask;
+            Plugin.PluginLogger.Debug("Socket closed");
+            recvTask = null;
         }
         catch (Exception ex)
         {
-            Plugin.PluginLogger.Error("Error opening socket " + ex.Message);
+            Plugin.PluginLogger.Error("Socket failed to close: " + ex.Message);
         }
-    }
-
-    public bool isRunning()
-    {
-        return recvTask != null && !recvTask.IsCompleted && !recvTask.IsCanceled && !recvTask.IsFaulted;
+        finally
+        {
+            cnclTokenSrc.Dispose();
+        }
     }
 
     private async Task ReceiveMessagesAsync(CancellationToken token)
@@ -84,41 +98,4 @@ public class UDPSocket : IDisposable
         }
     }
 
-
-    public void SendMessageAsync(string message, bool isEcho = false)
-    {
-        var port = isEcho ? incomingPort : outgoingPort;
-        using (var udpClient = new UdpClient(outgoingPort))
-        {
-            var data = Encoding.UTF8.GetBytes(message);
-            var _ = udpClient.SendAsync(data, data.Length, outgoingHost, port);
-        }
-    }
-
-    public void SendBytesAsync(byte[] data)
-    {
-        using (var udpClient = new UdpClient(outgoingPort)) {
-            var _ = udpClient.SendAsync(data, data.Length, outgoingHost, outgoingPort);
-        }
-    }
-
-    public async void Dispose()
-    {
-        Plugin.PluginLogger.Debug("Socket closing ... ");
-        try
-        {
-            cnclTokenSrc.Cancel();
-            await recvTask;
-            Plugin.PluginLogger.Debug("Socket closed");
-            recvTask = null;
-        }
-        catch (Exception ex)
-        {
-            Plugin.PluginLogger.Error("Socket failed to close: " + ex.Message);
-        }
-        finally
-        {
-            cnclTokenSrc.Dispose();
-        }
-    }
 }

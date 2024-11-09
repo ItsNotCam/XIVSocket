@@ -139,11 +139,11 @@ public class MainWindow : Window, IDisposable
         {
             if (netMgr.SocketRunning())
             {
-                netMgr.Dispose();
+                //netMgr.Dispose();
             }
             else
             {
-                netMgr.StartSocket();
+                //netMgr.StartSocket();
             }
         }
 

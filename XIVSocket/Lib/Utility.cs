@@ -12,5 +12,10 @@ namespace XIVSocket.App
             // Ensure the sheet is not null, then try to get the row by ID
             return sheet?.GetRow(id);
         }
+
+        public static ushort ToUint16BE(byte[] buffer, uint offset) {
+            return (ushort)((buffer[offset] << 8) | buffer[offset + 1]);
+        }
+
     }
 }

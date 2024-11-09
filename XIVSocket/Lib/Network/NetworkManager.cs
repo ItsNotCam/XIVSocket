@@ -1,105 +1,97 @@
-using Dalamud.Utility;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using XIVEvents.Models;
-using XIVSocket.Lib.Network.EzProto;
+using XIVSocket.Lib.Network;
 
 namespace XIVSocket.App.Network
 {
     public class NetworkManager : IDisposable
     {
-        internal UDPSocket udpSock { get; } = null!;
+        internal UDPClient udpClient { get; } = null!;
+        internal TCPServer tcpServer { get; } = null!;
 
         public NetworkManager()
         {
-            udpSock = new UDPSocket(27000, "127.0.0.1", 27001, "127.0.0.1");
+            //udpClient = new UDPClient(27001);
+            tcpServer = new TCPServer(58008);
+
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        //public void RunEcho()
-        //{
-        //    // createa a new task that runs an echo to port 27001 every 1 second
-        //    Task.Run(async () =>
-        //    {
-        //        while (true)
-        //        {
-        //            SendUdpMessage("Echo");
-        //            await Task.Delay(1000);
-        //        }
-        //    });
-        //}
-
-
-        public void StartSocket()
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            if (udpSock == null)
-            {
-                Plugin.PluginLogger.Error("Socket cannot start - it has not been initialized");
-                return;
-            }
-
-            if (udpSock.isRunning())
-            {
-                Plugin.PluginLogger.Error("Socket already running.");
-            }
-            else
-            {
-                Plugin.PluginLogger.Debug("Starting Socket");
-                try
-                {
-                    udpSock.Start();
-                    Plugin.PluginLogger.Debug("Started Socket");
-                }
-                catch (Exception e)
-                {
-                    Plugin.PluginLogger.Error($"Could not start socket {e.Message}");
-                }
-                
+            if(tcpServer != null && tcpServer.isRunning) {
+                tcpServer.Dispose();
             }
         }
 
-        public void StopSocket()
-        {
-            if (udpSock != null && udpSock.isRunning())
-            {
-                udpSock.Dispose();
-            }
-            else
-            {
-                Plugin.PluginLogger.Info("Socket already stopped.");
-            }
-        }
-
-        public bool SocketRunning()
-        {
-            return udpSock != null && udpSock.isRunning();
-        }
+        public bool SocketRunning() => this.tcpServer.isRunning;
 
         public void SendUdpMessage(string message)
         {
-            udpSock.SendMessageAsync(message);
+            if (udpClient == null) {
+                return;
+            }
+
+            udpClient.SendMessageAsync(message);
         }
 
         public void SendMovementMessage(LocationModel location) {
-            float x = location.position.X;
-            //float y = location.position.Y;
-            float z = location.position.Z;
+            if(udpClient == null) {
+                return;
+            } 
 
-            //byte[] data = new byte[13];
+            float x = location.position.X;
+            float y = location.position.Y;
+
             byte[] data = new byte[9];
             data[0] = 0x01;
 
             BitConverter.GetBytes(x).CopyTo(data, 1);
-            //BitConverter.GetBytes(y).CopyTo(data, 5););
-            BitConverter.GetBytes(z).CopyTo(data, 5);
-            //BitConverter.GetBytes(z).CopyTo(data, 9);
-
-            udpSock.SendBytesAsync(data);
+            BitConverter.GetBytes(y).CopyTo(data, 5);
+            udpClient.SendBytesAsync(data);
         }
 
         public void Dispose()
         {
-            StopSocket();
+            if(udpClient != null) {
+                udpClient.Dispose();
+            }
+
+            if(tcpServer != null) {
+                tcpServer.Dispose();
+            }
         }
     }
 }
+
+/*
+ * 
+
+        public void StartSocket()
+        {
+            //if (tcpServer == null)
+            //{
+            //    Plugin.PluginLogger.Error("Socket cannot start - it has not been initialized");
+            //    return;
+            //}
+
+            //if (tcpServer.isRunning())
+            //{
+            //    Plugin.PluginLogger.Error("Socket already running.");
+            //}
+            //else
+            //{
+            //    Plugin.PluginLogger.Debug("Starting Socket");
+            //    try
+            //    {
+            //        udpClient.Start();
+            //        Plugin.PluginLogger.Debug("Started Socket");
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Plugin.PluginLogger.Error($"Could not start socket {e.Message}");
+            //    }
+                
+            //}
+        }
+*/
