@@ -36,7 +36,7 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     public NetworkManager NetworkManager { get; }
-    public GameManager GameManager { get; }
+    public XIVEventManager GameManager { get; }
     public Logger Logger { get; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
@@ -76,10 +76,8 @@ public sealed class Plugin : IDalamudPlugin
         /* Network */
         NetworkManager = new NetworkManager();
 
-        //NetworkManager.RunEcho();
-
         /* Events */
-        GameManager = new GameManager();
+        GameManager = new XIVEventManager();
         GameManager.RegisterListeners(new PlayerMoveListener(this));
         GameManager.Listen();
 
