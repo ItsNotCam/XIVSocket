@@ -140,14 +140,14 @@ public class MainWindow : Window, IDisposable
         }
 
         string[] txt = [
-            Plugin.GameManager.GetLocation().region.name,
-            Plugin.GameManager.GetLocation().territory.name,
-            Plugin.GameManager.GetLocation().area.name,
-            Plugin.GameManager.GetLocation().subArea.name
+            Plugin.XIVStateManager.GetLocation().region.name,
+            Plugin.XIVStateManager.GetLocation().territory.name,
+            Plugin.XIVStateManager.GetLocation().area.name,
+            Plugin.XIVStateManager.GetLocation().subArea.name
         ];
         ImGui.Text(string.Join(", ", txt.ToList()));
         ImGui.Spacing();
-        ImGui.Text(Plugin.GameManager.GetLocation().ToString());
+        ImGui.Text(Plugin.XIVStateManager.GetLocation().ToString());
 
         if (ImGui.Button("Show Settings"))
         {
