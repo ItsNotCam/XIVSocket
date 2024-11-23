@@ -1,6 +1,5 @@
 using Lumina.Excel;
 using System;
-using XIVEvents;
 
 namespace XIVSocket.App
 {
@@ -19,7 +18,7 @@ namespace XIVSocket.App
         {
             if (OperatingSystem.IsWindowsVersionAtLeast(7))
             {
-                return Services.DataManager.GetExcelSheet<T>();
+                return Plugin.DataManager.GetExcelSheet<T>();
             }
             return null;
         }
