@@ -1,30 +1,42 @@
 using System;
 using XIVEvents.Models;
 using XIVSocket.Lib.Network;
+using XIVSocket.Lib.Network.Socket;
 
 namespace XIVSocket.App.Network
 {
     public class NetworkManager : IDisposable
     {
-        internal UDPClient udpClient { get; } = null!;
-        internal TCPServer tcpServer { get; } = null!;
+        private UDPClient udpClient { get; } = null!;
+        private TCPServer tcpServer { get; } = null!;
 
-        public NetworkManager()
+        private EzWsServer ezWsServer { get; } = null!;
+
+        private Plugin plugin;
+
+        public NetworkManager(Plugin plugin)
         {
             //udpClient = new UDPClient(27001);
-            tcpServer = new TCPServer(58008);
+            //tcpServer = new TCPServer(58008);
+            this.plugin = plugin;
+
+            ezWsServer = new EzWsServer(50085, this);
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            if(tcpServer != null && tcpServer.isRunning) {
-                tcpServer.Dispose();
+            //if(tcpServer != null && tcpServer.isRunning) {
+            //    tcpServer.Dispose();
+            //    ezWsServer.Dispose();
+            //}
+            if(ezWsServer != null) {
+                ezWsServer.Dispose();
             }
         }
 
-        public bool SocketRunning() => this.tcpServer.isRunning;
+        public bool SocketRunning() => this.ezWsServer.IsRunning();
 
         public void SendUdpMessage(string message)
         {
@@ -48,8 +60,21 @@ namespace XIVSocket.App.Network
 
             BitConverter.GetBytes(x).CopyTo(data, 1);
             BitConverter.GetBytes(y).CopyTo(data, 5);
-            udpClient.SendBytesAsync(data);
+            //udpClient.SendBytesAsync(data);
         }
+
+		public string HandleRequest(uint packetId, uint packetFlag, string payload)
+		{
+            EzFlag flag = (EzFlag)packetFlag;
+            switch (flag)
+			{
+				case EzFlag.JOB_MAIN:
+                    JobModel job = plugin.XIVStateManager.getMainJob();
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(job);
+            }
+
+			return null;
+		}
 
         public void Dispose()
         {
@@ -60,38 +85,10 @@ namespace XIVSocket.App.Network
             if(tcpServer != null) {
                 tcpServer.Dispose();
             }
+
+            if (ezWsServer != null) {
+                ezWsServer.Dispose();
+            }
         }
     }
 }
-
-/*
- * 
-
-        public void StartSocket()
-        {
-            //if (tcpServer == null)
-            //{
-            //    Plugin.PluginLogger.Error("Socket cannot start - it has not been initialized");
-            //    return;
-            //}
-
-            //if (tcpServer.isRunning())
-            //{
-            //    Plugin.PluginLogger.Error("Socket already running.");
-            //}
-            //else
-            //{
-            //    Plugin.PluginLogger.Debug("Starting Socket");
-            //    try
-            //    {
-            //        udpClient.Start();
-            //        Plugin.PluginLogger.Debug("Started Socket");
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Plugin.PluginLogger.Error($"Could not start socket {e.Message}");
-            //    }
-                
-            //}
-        }
-*/

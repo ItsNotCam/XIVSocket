@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Threading;
 
 using XIVSocket.App;
-using XIVSocket.Lib.Network.EzProto.Structs;
-using XIVSocket.Lib.Network.ez;
+using XIVSocket.Lib.Network.Socket.Structs;
+using XIVSocket.Lib.Network.Socket;
 
 namespace XIVSocket.Lib.Network
 {
