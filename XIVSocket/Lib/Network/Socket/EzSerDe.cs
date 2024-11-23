@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace XIVSocket.Lib.Network.ez
+namespace XIVSocket.Lib.Network.Socket
 {
-    public struct EzDeserializedPacket
+    internal struct EzDeserializedPacket
     {
-        public int id { get; set; }
-        public int flag { get; set; }
+        public uint id { get; set; }
+        public uint flag { get; set; }
         public byte[] payload { get; set; }
     }
 
@@ -24,21 +21,21 @@ namespace XIVSocket.Lib.Network.ez
             byte[] payload;
 
             // Get the first 16 bits
-            int shortValue = (msg[0] << 8) | msg[1];
-
-            // Check if the first 6 bits match the fixed-length packet header
-            if (((shortValue >> 10) & 0x3F) != 0x1E)
             {
-                throw new Exception("Malformed packet");
+                int shortValue = (msg[0] << 8) | msg[1];
+
+                // Check if the first 6 bits match the fixed-length packet header
+                if (((shortValue >> 10) & EzFlag.EZ) != EzFlag.EZ) {
+                    throw new Exception("Malformed packet");
+                }
             }
 
-            // Packet length is the last 10 bits
-            packetLength = shortValue & 0x3FF;
-
-            // Get the next 16 bits for ID and flag
-            shortValue = (msg[2] << 8) | msg[3];
-            id = (shortValue >> 6) & 0x3FF;
-            flag = shortValue & 0x3F;
+            {
+                int shortValue = (msg[2] << 8) | msg[3];
+                id = (shortValue >> 6) & 0x3FF;
+                flag = shortValue & 0x3F;
+                packetLength = shortValue & 0x3FF;
+            }
 
             // Extract the payload
             payload = new byte[packetLength - 4];
@@ -48,8 +45,8 @@ namespace XIVSocket.Lib.Network.ez
 
             return new EzDeserializedPacket
             {
-                id = id,
-                flag = flag,
+                id = (uint)id,
+                flag = (uint)flag,
                 payload = payload
             };
         }
