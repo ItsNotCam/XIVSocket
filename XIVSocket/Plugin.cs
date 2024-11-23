@@ -36,7 +36,7 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     public NetworkManager NetworkManager { get; }
-    public XIVEventManager GameManager { get; }
+    public XIVStateManager XIVStateManager { get; }
     public Logger Logger { get; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
@@ -74,12 +74,12 @@ public sealed class Plugin : IDalamudPlugin
         /*******************/
 
         /* Network */
-        NetworkManager = new NetworkManager();
+        NetworkManager = new NetworkManager(this);
 
         /* Events */
-        GameManager = new XIVEventManager();
-        GameManager.RegisterListeners(new PlayerMoveListener(this));
-        GameManager.Listen();
+        XIVStateManager = new XIVStateManager();
+        //XIVEventManager.RegisterListeners(new PlayerMoveListener(this));
+        //XIVEventManager.Listen();
 
         /**********/
         /* FINITO */
@@ -99,7 +99,7 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager.RemoveHandler(CommandName);
 
         NetworkManager.Dispose();
-        GameManager.Dispose();
+        XIVStateManager.Dispose();
     }
 
     private void OnCommand(string command, string args) => ToggleMainUI();
