@@ -1,16 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 using System.Threading;
-using XIVSocket.App.Network;
-using System.Reflection.Metadata;
 
 using XIVSocket.App;
+using XIVSocket.Lib.Network.EzProto.Structs;
+using XIVSocket.Lib.Network.ez;
 
 namespace XIVSocket.Lib.Network
 {
@@ -75,20 +72,17 @@ namespace XIVSocket.Lib.Network
                             continue;
                         }
 
-                        int length = Utility.ToUint16BE(msg, 1);
-                        string id = Encoding.UTF8.GetString(msg, 3, 8);
-                        string message = Encoding.UTF8.GetString(msg, 11, length);
-
-                        if (msg[11 + length] != 0x1D) {
-                            Plugin.PluginLogger.Error("Invalid message received");
-                            continue;
-                        }
+                        EzDeserializedPacket packet = EzSerDe.Deserialize(msg);
+                        string message = Encoding.UTF8.GetString(packet.payload);
+                        int id = packet.id;
+                        int flag = packet.flag;
 
                         //stream.Dispose();
                         //stream = client.GetStream();
                         //stream.Write(msg, 0, msg.Length);
 
-                        Plugin.PluginLogger.Info($"Received message of length {length} with id {id} -> {message}");
+
+                        //Plugin.PluginLogger.Info($"Received message of length {length} with id {id} -> {message}");
 
                     } catch (Exception e) {
                         Plugin.PluginLogger.Error($"Error reading message - {e.Message}");
