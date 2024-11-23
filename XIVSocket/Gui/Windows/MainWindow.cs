@@ -7,8 +7,8 @@ using ImGuiNET;
 
 using System.Linq;
 
-using Lumina.Excel.GeneratedSheets;
 using System.Collections.Generic;
+using Lumina.Excel.Sheets;
 
 namespace XIVSocket.Gui.Windows;
 
@@ -44,7 +44,7 @@ public class MainWindow : Window, IDisposable
         var recipes = Plugin.DataManager.GetExcelSheet<Recipe>()!;
         recipes.ToList().ForEach(recipe =>
         {
-            var rowId = recipe.ItemResult.Row;
+            var rowId = recipe.ItemResult.RowId;
             if (RecipesByResult.ContainsKey(rowId))
             {
                 RecipesByResult[rowId].Add(recipe);
@@ -81,55 +81,47 @@ public class MainWindow : Window, IDisposable
 
     void GetRecipeInfo(uint itemId, uint depth)
     {
-        if (depth > 10)
-        {
-            itemInfo += "\nMaximum item depth exceeded";
-            return;
-        }
+        //if (depth > 10)
+        //{
+        //    itemInfo += "\nMaximum item depth exceeded";
+        //    return;
+        //}
 
-        List<Recipe> recipes = null;
-        if (!RecipesByResult.TryGetValue(itemId, out recipes))
-        {
-            return;
-        }
+        //List<Recipe> recipes = null;
+        //if (!RecipesByResult.TryGetValue(itemId, out recipes))
+        //{
+        //    return;
+        //}
 
-        var ingredients = recipes.First().UnkData5.Where(x => x.AmountIngredient > 0).ToList();
-        foreach (var ingredient in ingredients)
-        {
-            var ingredientId = (uint)ingredient.ItemIngredient;
-            int amount = ingredient.AmountIngredient;
-            var row = Items.GetRow(ingredientId);
-            if (row == null)
-            {
-                continue;
-            }
+        //var ingredients = recipes.First().Unknown1.Where(x => x.AmountIngredient > 0).ToList();
+        //foreach (var ingredient in ingredients)
+        //{
+        //    var ingredientId = (uint)ingredient.ItemIngredient;
+        //    int amount = ingredient.AmountIngredient;
+        //    var row = Items.GetRow(ingredientId);
+        //    if (row == null)
+        //    {
+        //        continue;
+        //    }
 
-            string curItemName = row.Name;
-            for (var i = 0; i < depth; i++)
-            {
-                itemInfo += "\t";
-            }
-            itemInfo += amount + " " + curItemName + "\n";
-            GetRecipeInfo(ingredientId, depth + 1);
-        }
+        //    string curItemName = row.Name;
+        //    for (var i = 0; i < depth; i++)
+        //    {
+        //        itemInfo += "\t";
+        //    }
+        //    itemInfo += amount + " " + curItemName + "\n";
+        //    GetRecipeInfo(ingredientId, depth + 1);
+        //}
     }
 
     void GetItemInfo()
     {
         Plugin.ChatGui.Print("Searching for " + searchItem);
-        var searchItemObj = Items.FirstOrDefault(i => i.Name.ToString().Equals(searchItem), null);
-        if (searchItemObj == null)
-        {
-            Plugin.ChatGui.Print("No such item exists");
-        }
-        else
-        {
-            Plugin.ChatGui.Print("found " + searchItemObj.Name);
+        var searchItemObj = Items.First(i => i.Name.ToString().Equals(searchItem));
+        Plugin.ChatGui.Print("found " + searchItemObj.Name);
 
-            itemInfo = "";
-            itemName = searchItemObj.Name;
-            GetRecipeInfo(searchItemObj.RowId, 0);
-        }
+        string itemName = searchItemObj.Name.ExtractText();
+        GetRecipeInfo(searchItemObj.RowId, 0);
     }
 
     public override void Draw()
