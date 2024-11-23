@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using System.Runtime.InteropServices;
 using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using Lumina.Excel.GeneratedSheets;
-using XIVSocket.Lib.Aetherite;
+using Lumina.Excel.Sheets;
 
 namespace XIVSocket.Lib.Aetherite.Managers
 {
@@ -146,7 +144,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
             var sheet = Plugin.DataManager.GetExcelSheet<Aetheryte>(ClientLanguage.English)!;
             foreach (var aetheryte in sheet)
             {
-                if (aetheryte.PlaceName.Row is 1145 or 1160)
+                if (aetheryte.PlaceName.RowId is 1145 or 1160)
                     list.Add(aetheryte.RowId);
             }
             array = list.ToArray();
@@ -158,7 +156,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
             dict.Clear();
             foreach (var row in sheet)
             {
-                var name = row.PlaceName.Value?.Name?.ToString();
+                var name = row.PlaceName.Value.Name.ExtractText();
                 if (string.IsNullOrEmpty(name))
                     continue;
                 name = Plugin.PluginInterface.Sanitizer.Sanitize(name);
@@ -172,7 +170,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
             dict.Clear();
             foreach (var row in sheet)
             {
-                var name = row.Territory.Value?.PlaceName.Value?.Name?.ToString();
+                var name = row.Territory.Value.PlaceName.Value.Name.ExtractText();
                 if (string.IsNullOrEmpty(name))
                     continue;
                 if (row is not { IsAetheryte: true }) continue;

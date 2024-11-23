@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
-using XIVSocket.Lib.Aetherite;
 
 namespace XIVSocket.Lib.Aetherite.Managers
 {
@@ -26,7 +18,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
                 return false;
             }
 
-            if (Plugin.ClientState.LocalPlayer.CurrentWorld.Id != Plugin.ClientState.LocalPlayer.HomeWorld.Id)
+            if (Plugin.ClientState.LocalPlayer.CurrentWorld.RowId != Plugin.ClientState.LocalPlayer.HomeWorld.RowId)
             {
                 if (AetheryteManager.IsHousingAetheryte(info.AetheryteId, info.Plot, info.Ward, info.SubIndex))
                 {
@@ -51,7 +43,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
                 return false;
             }
 
-            if (Plugin.ClientState.LocalPlayer.CurrentWorld.Id != Plugin.ClientState.LocalPlayer.HomeWorld.Id)
+            if (Plugin.ClientState.LocalPlayer.CurrentWorld.RowId != Plugin.ClientState.LocalPlayer.HomeWorld.RowId)
             {
                 if (AetheryteManager.IsHousingAetheryte(alias.AetheryteId, alias.Plot, alias.Ward, alias.SubIndex))
                 {
@@ -64,10 +56,9 @@ namespace XIVSocket.Lib.Aetherite.Managers
 
         private static string GetLogMessage(uint id)
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<LogMessage>();
+            var sheet = Plugin.DataManager.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
             if (sheet == null) return string.Empty;
-            var row = sheet.GetRow(id);
-            return row == null ? string.Empty : row.Text.ToString();
+            return sheet.GetRow(id).Text.ExtractText();
         }
     }
 }
