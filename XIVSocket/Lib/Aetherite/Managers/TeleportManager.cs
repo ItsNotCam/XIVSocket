@@ -7,22 +7,22 @@ namespace XIVSocket.Lib.Aetherite.Managers
     {
         public static bool Teleport(TeleportInfo info)
         {
-            if (Plugin.ClientState.LocalPlayer == null)
+            if (XIVSocketPlugin.ClientState.LocalPlayer == null)
                 return false;
             var status = ActionManager.Instance()->GetActionStatus(ActionType.Action, 5);
             if (status != 0)
             {
                 var msg = GetLogMessage(status);
                 if (!string.IsNullOrEmpty(msg))
-                    Plugin.PluginLogger.Debug(msg, true);
+                    XIVSocketPlugin.PluginLogger.Debug(msg, true);
                 return false;
             }
 
-            if (Plugin.ClientState.LocalPlayer.CurrentWorld.RowId != Plugin.ClientState.LocalPlayer.HomeWorld.RowId)
+            if (XIVSocketPlugin.ClientState.LocalPlayer.CurrentWorld.RowId != XIVSocketPlugin.ClientState.LocalPlayer.HomeWorld.RowId)
             {
                 if (AetheryteManager.IsHousingAetheryte(info.AetheryteId, info.Plot, info.Ward, info.SubIndex))
                 {
-                    Plugin.PluginLogger.Debug($"Unable to Teleport to {AetheryteManager.GetAetheryteName(info)} while visiting other Worlds.", true);
+                    XIVSocketPlugin.PluginLogger.Debug($"Unable to Teleport to {AetheryteManager.GetAetheryteName(info)} while visiting other Worlds.", true);
                     return false;
                 }
             }
@@ -32,22 +32,22 @@ namespace XIVSocket.Lib.Aetherite.Managers
 
         public static bool Teleport(TeleportAlias alias)
         {
-            if (Plugin.ClientState.LocalPlayer == null)
+            if (XIVSocketPlugin.ClientState.LocalPlayer == null)
                 return false;
             var status = ActionManager.Instance()->GetActionStatus(ActionType.Action, 5);
             if (status != 0)
             {
                 var msg = GetLogMessage(status);
                 if (!string.IsNullOrEmpty(msg))
-                    Plugin.PluginLogger.Debug(msg);
+                    XIVSocketPlugin.PluginLogger.Debug(msg);
                 return false;
             }
 
-            if (Plugin.ClientState.LocalPlayer.CurrentWorld.RowId != Plugin.ClientState.LocalPlayer.HomeWorld.RowId)
+            if (XIVSocketPlugin.ClientState.LocalPlayer.CurrentWorld.RowId != XIVSocketPlugin.ClientState.LocalPlayer.HomeWorld.RowId)
             {
                 if (AetheryteManager.IsHousingAetheryte(alias.AetheryteId, alias.Plot, alias.Ward, alias.SubIndex))
                 {
-                    Plugin.PluginLogger.Debug($"Unable to Teleport to {alias.Aetheryte} while visiting other Worlds.", true);
+                    XIVSocketPlugin.PluginLogger.Debug($"Unable to Teleport to {alias.Aetheryte} while visiting other Worlds.", true);
                     return false;
                 }
             }
@@ -56,7 +56,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
 
         private static string GetLogMessage(uint id)
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
+            var sheet = XIVSocketPlugin.DataManager.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
             if (sheet == null) return string.Empty;
             return sheet.GetRow(id).Text.ExtractText();
         }

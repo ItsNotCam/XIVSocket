@@ -86,7 +86,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
 
         public static unsafe bool UpdateAvailableAetherytes()
         {
-            if (Plugin.ClientState.LocalPlayer == null)
+            if (XIVSocketPlugin.ClientState.LocalPlayer == null)
                 return false;
             try
             {
@@ -101,7 +101,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
             catch (Exception ex)
             {
                 AvailableAetherytes.Clear();
-                Plugin.PluginLogger.Error(ex, "Error while Updating the Aetheryte List");
+                XIVSocketPlugin.PluginLogger.Error(ex, "Error while Updating the Aetheryte List");
             }
             return false;
         }
@@ -127,7 +127,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
             var tm = Framework.Instance()->GetUIModule()->GetRaptureTextModule();
             var sp = tm->GetAddonText(8518);
             var name = Marshal.PtrToStringUTF8(new nint(sp)) ?? string.Empty;
-            return Plugin.PluginInterface.Sanitizer.Sanitize(name);
+            return XIVSocketPlugin.PluginInterface.Sanitizer.Sanitize(name);
         }
 
         private static unsafe string GetSharedHouseName(int ward, int plot)
@@ -141,7 +141,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
         private static void SetupEstateIds(out uint[] array)
         {
             var list = new List<uint>(10);
-            var sheet = Plugin.DataManager.GetExcelSheet<Aetheryte>(ClientLanguage.English)!;
+            var sheet = XIVSocketPlugin.DataManager.GetExcelSheet<Aetheryte>(ClientLanguage.English)!;
             foreach (var aetheryte in sheet)
             {
                 if (aetheryte.PlaceName.RowId is 1145 or 1160)
@@ -152,21 +152,21 @@ namespace XIVSocket.Lib.Aetherite.Managers
 
         private static void SetupAetherytes(IDictionary<uint, string> dict, ClientLanguage language)
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<Aetheryte>(language)!;
+            var sheet = XIVSocketPlugin.DataManager.GetExcelSheet<Aetheryte>(language)!;
             dict.Clear();
             foreach (var row in sheet)
             {
                 var name = row.PlaceName.Value.Name.ExtractText();
                 if (string.IsNullOrEmpty(name))
                     continue;
-                name = Plugin.PluginInterface.Sanitizer.Sanitize(name);
+                name = XIVSocketPlugin.PluginInterface.Sanitizer.Sanitize(name);
                 dict[row.RowId] = name;
             }
         }
 
         private static void SetupMaps(IDictionary<uint, string> dict, ClientLanguage language)
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<Aetheryte>(language)!;
+            var sheet = XIVSocketPlugin.DataManager.GetExcelSheet<Aetheryte>(language)!;
             dict.Clear();
             foreach (var row in sheet)
             {
@@ -174,7 +174,7 @@ namespace XIVSocket.Lib.Aetherite.Managers
                 if (string.IsNullOrEmpty(name))
                     continue;
                 if (row is not { IsAetheryte: true }) continue;
-                name = Plugin.PluginInterface.Sanitizer.Sanitize(name);
+                name = XIVSocketPlugin.PluginInterface.Sanitizer.Sanitize(name);
                 dict[row.RowId] = name;
             }
         }
