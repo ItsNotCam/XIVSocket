@@ -10,30 +10,18 @@ namespace XIVSocket.App.Network
         private UDPClient udpClient { get; } = null!;
         private TCPServer tcpServer { get; } = null!;
 
+        private EzRouteHandler ezRouteHandler { get; } = null;
         private EzWsServer ezWsServer { get; } = null!;
 
-        private Plugin plugin;
+        private XIVSocketPlugin plugin { get; }
 
-        public NetworkManager(Plugin plugin)
+        public NetworkManager(XIVSocketPlugin plugin)
         {
             //udpClient = new UDPClient(27001);
             //tcpServer = new TCPServer(58008);
             this.plugin = plugin;
-
             ezWsServer = new EzWsServer(50085, this);
-
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        }
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            //if(tcpServer != null && tcpServer.isRunning) {
-            //    tcpServer.Dispose();
-            //    ezWsServer.Dispose();
-            //}
-            if(ezWsServer != null) {
-                ezWsServer.Dispose();
-            }
+            ezRouteHandler = new EzRouteHandler(this.plugin);
         }
 
         public bool SocketRunning() => this.ezWsServer.IsRunning();
@@ -63,18 +51,7 @@ namespace XIVSocket.App.Network
             //udpClient.SendBytesAsync(data);
         }
 
-		public string HandleRequest(uint packetId, uint packetFlag, string payload)
-		{
-            EzFlag flag = (EzFlag)packetFlag;
-            switch (flag)
-			{
-				case EzFlag.JOB_MAIN:
-                    JobModel job = plugin.XIVStateManager.getMainJob();
-                    return Newtonsoft.Json.JsonConvert.SerializeObject(job);
-            }
-
-			return null;
-		}
+		public string? HandleRequest(EzFlag flag, string payload) => ezRouteHandler.Handle(flag, payload);
 
         public void Dispose()
         {

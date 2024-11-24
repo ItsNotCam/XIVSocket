@@ -27,7 +27,9 @@ namespace XIVSocket.Lib.Network.Codec
 
             for (var i = 0; i < length; i++)
             {
-                var charIndex = Math.Max(0x00, Array.IndexOf(EzEncoding.Characters, data[i].ToString()));
+                var charIndex = Math.Max(
+                    0x00, Array.IndexOf(EzEncoding.Characters, data[i].ToString()
+                ));
                 bitPacker.Pack(charIndex & 0x3F);
             }
 

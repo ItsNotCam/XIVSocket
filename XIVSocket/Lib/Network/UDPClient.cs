@@ -41,17 +41,17 @@ public class UDPClient : IDisposable
 
     public async void Dispose()
     {
-        Plugin.PluginLogger.Debug("Socket closing ... ");
+        XIVSocketPlugin.PluginLogger.Debug("Socket closing ... ");
         try
         {
             cnclTokenSrc.Cancel();
             await recvTask;
-            Plugin.PluginLogger.Debug("Socket closed");
+            XIVSocketPlugin.PluginLogger.Debug("Socket closed");
             recvTask = null;
         }
         catch (Exception ex)
         {
-            Plugin.PluginLogger.Error("Socket failed to close: " + ex.Message);
+            XIVSocketPlugin.PluginLogger.Error("Socket failed to close: " + ex.Message);
         }
         finally
         {
@@ -63,7 +63,7 @@ public class UDPClient : IDisposable
     {
         using (var udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, incomingPort)))
         {
-            Plugin.PluginLogger.Debug($"Socket open at: {IPAddress.Any.ToString()}:{incomingPort} and waiting for messages...");
+            XIVSocketPlugin.PluginLogger.Debug($"Socket open at: {IPAddress.Any.ToString()}:{incomingPort} and waiting for messages...");
 
             try
             {
@@ -73,8 +73,8 @@ public class UDPClient : IDisposable
                     var receivedMessage = Encoding.UTF8.GetString(receivedResult.Buffer);
 
                     var friendlyMessage = receivedMessage.Replace(" - respond", "");
-                    Plugin.PluginLogger.Debug($"Recv from [{receivedResult.RemoteEndPoint}]: {friendlyMessage}");
-                    Plugin.ChatGui.Print($"[XIVSocket] {friendlyMessage}");
+                    XIVSocketPlugin.PluginLogger.Debug($"Recv from [{receivedResult.RemoteEndPoint}]: {friendlyMessage}");
+                    XIVSocketPlugin.ChatGui.Print($"[XIVSocket] {friendlyMessage}");
 
 
                     if (receivedMessage.Contains("respond"))
@@ -85,15 +85,15 @@ public class UDPClient : IDisposable
             }
             catch (ObjectDisposedException)
             {
-                Plugin.PluginLogger.Debug("Socket closed gracefully.");
+                XIVSocketPlugin.PluginLogger.Debug("Socket closed gracefully.");
             }
             catch (Exception ex) when (token.IsCancellationRequested)
             {
-                Plugin.PluginLogger.Debug($"Operation canceled: {ex.Message}");
+                XIVSocketPlugin.PluginLogger.Debug($"Operation canceled: {ex.Message}");
             }
             catch (Exception ex)
             {
-                Plugin.PluginLogger.Error($"Unexpected error: {ex.Message}");
+                XIVSocketPlugin.PluginLogger.Error($"Unexpected error: {ex.Message}");
             }
         }
     }

@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-using XIVSocket.App;
-using XIVSocket.Lib.Network.Socket.Structs;
 using XIVSocket.Lib.Network.Socket;
 
 namespace XIVSocket.Lib.Network
@@ -23,7 +21,7 @@ namespace XIVSocket.Lib.Network
 
         public TCPServer(Int32 port)
         {
-            Plugin.PluginLogger.Info("Starting TCP Server ... on port " + port);
+            XIVSocketPlugin.PluginLogger.Info("Starting TCP Server ... on port " + port);
             this.port = port;
             server = new TcpListener(IPAddress.Any, port);
             cancellationToken = new CancellationTokenSource();
@@ -37,10 +35,10 @@ namespace XIVSocket.Lib.Network
             {
                 try {
                     server.Start();
-                    Plugin.PluginLogger.Info($"Server started on port {port}");
+                    XIVSocketPlugin.PluginLogger.Info($"Server started on port {port}");
                     this.isRunning = true;
                 } catch (Exception e) {
-                    Plugin.PluginLogger.Error($"Could not start server on port {port} - {e.Message}\nTrying again in 5 seconds ... ");
+                    XIVSocketPlugin.PluginLogger.Error($"Could not start server on port {port} - {e.Message}\nTrying again in 5 seconds ... ");
                     await Task.Delay(5000);
                     this.isRunning = false;
                 }
@@ -49,7 +47,7 @@ namespace XIVSocket.Lib.Network
             try {
                 handleConnections();
             } catch (Exception e) {
-                Plugin.PluginLogger.Error($"Error handling connections - {e.Message}");
+                XIVSocketPlugin.PluginLogger.Error($"Error handling connections - {e.Message}");
             }
         }
 
@@ -68,14 +66,14 @@ namespace XIVSocket.Lib.Network
 
                         // find the ez flag
                         if (msg[0] != 0x1D) {
-                            Plugin.PluginLogger.Error("Invalid message received");
+                            XIVSocketPlugin.PluginLogger.Error("Invalid message received");
                             continue;
                         }
 
                         EzDeserializedPacket packet = EzSerDe.Deserialize(msg);
                         string message = Encoding.UTF8.GetString(packet.payload);
-                        int id = packet.id;
-                        int flag = packet.flag;
+                        uint id = packet.id;
+                        uint flag = packet.flag;
 
                         //stream.Dispose();
                         //stream = client.GetStream();
@@ -85,7 +83,7 @@ namespace XIVSocket.Lib.Network
                         //Plugin.PluginLogger.Info($"Received message of length {length} with id {id} -> {message}");
 
                     } catch (Exception e) {
-                        Plugin.PluginLogger.Error($"Error reading message - {e.Message}");
+                        XIVSocketPlugin.PluginLogger.Error($"Error reading message - {e.Message}");
                         break;
                     }
                 }
@@ -98,14 +96,14 @@ namespace XIVSocket.Lib.Network
 
         public void sendMessage(byte[] message) {
             if(ns == null) {
-                Plugin.PluginLogger.Error("Network stream is null");
+                XIVSocketPlugin.PluginLogger.Error("Network stream is null");
             } else if (!ns.CanWrite) {
-                Plugin.PluginLogger.Error("Network stream cannot write");
+                XIVSocketPlugin.PluginLogger.Error("Network stream cannot write");
             } else {
                 try { 
                     ns.WriteAsync(message, 0, message.Length); 
                 } catch (Exception e) {
-                    Plugin.PluginLogger.Error($"Error sending message - {e.Message}");
+                    XIVSocketPlugin.PluginLogger.Error($"Error sending message - {e.Message}");
                 }
             }
         }
@@ -126,7 +124,7 @@ namespace XIVSocket.Lib.Network
                     client.Close();
                 }
             } catch (Exception e) {
-                Plugin.PluginLogger.Error($"Error disposing server - {e.Message}");
+                XIVSocketPlugin.PluginLogger.Error($"Error disposing server - {e.Message}");
             }
         }
 
