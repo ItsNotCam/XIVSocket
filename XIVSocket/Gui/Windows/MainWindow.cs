@@ -15,7 +15,7 @@ namespace XIVSocket.Gui.Windows;
 public class MainWindow : Window, IDisposable
 {
     private string GoatImagePath;
-    private Plugin Plugin;
+    private XIVSocketPlugin Plugin;
 
     private string[] playerAttributeNames;
     private int[] playerAttributes;
@@ -33,15 +33,15 @@ public class MainWindow : Window, IDisposable
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
-    public MainWindow(Plugin plugin, string goatImagePath)
+    public MainWindow(XIVSocketPlugin plugin, string goatImagePath)
         : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollWithMouse)
     {
         searchItem = "";
 
-        Items = Plugin.DataManager.GetExcelSheet<Item>()!;
+        Items = XIVSocketPlugin.DataManager.GetExcelSheet<Item>()!;
 
         RecipesByResult = new Dictionary<uint, List<Recipe>>();
-        var recipes = Plugin.DataManager.GetExcelSheet<Recipe>()!;
+        var recipes = XIVSocketPlugin.DataManager.GetExcelSheet<Recipe>()!;
         recipes.ToList().ForEach(recipe =>
         {
             var rowId = recipe.ItemResult.RowId;
@@ -116,9 +116,9 @@ public class MainWindow : Window, IDisposable
 
     void GetItemInfo()
     {
-        Plugin.ChatGui.Print("Searching for " + searchItem);
+        XIVSocketPlugin.ChatGui.Print("Searching for " + searchItem);
         var searchItemObj = Items.First(i => i.Name.ToString().Equals(searchItem));
-        Plugin.ChatGui.Print("found " + searchItemObj.Name);
+        XIVSocketPlugin.ChatGui.Print("found " + searchItemObj.Name);
 
         string itemName = searchItemObj.Name.ExtractText();
         GetRecipeInfo(searchItemObj.RowId, 0);
@@ -157,7 +157,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Spacing();
 
         ImGui.Text("Have a goat:");
-        var goatImage = Plugin.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+        var goatImage = XIVSocketPlugin.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
         if (goatImage != null)
         {
             ImGuiHelpers.ScaledIndent(55f);
