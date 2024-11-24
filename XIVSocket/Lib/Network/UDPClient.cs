@@ -47,7 +47,6 @@ public class UDPClient : IDisposable
             cnclTokenSrc.Cancel();
             await recvTask;
             XIVSocketPlugin.PluginLogger.Debug("Socket closed");
-            recvTask = null;
         }
         catch (Exception ex)
         {

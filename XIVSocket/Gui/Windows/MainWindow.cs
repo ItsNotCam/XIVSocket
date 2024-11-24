@@ -14,21 +14,8 @@ namespace XIVSocket.Gui.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private string GoatImagePath;
-    private XIVSocketPlugin Plugin;
-
-    private string[] playerAttributeNames;
-    private int[] playerAttributes;
-
-    private Lumina.Excel.ExcelSheet<Item> Items;
-    private Lumina.Excel.ExcelSheet<Recipe> Recipes;
-    private Dictionary<uint, List<Recipe>> RecipesByResult;
-
-    private string itemInfo;
-    private string itemName;
-
-    private string searchItem;
-
+    private string goatImagePath;
+    private XIVSocketPlugin plugin;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -36,26 +23,6 @@ public class MainWindow : Window, IDisposable
     public MainWindow(XIVSocketPlugin plugin, string goatImagePath)
         : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollWithMouse)
     {
-        searchItem = "";
-
-        Items = XIVSocketPlugin.DataManager.GetExcelSheet<Item>()!;
-
-        RecipesByResult = new Dictionary<uint, List<Recipe>>();
-        var recipes = XIVSocketPlugin.DataManager.GetExcelSheet<Recipe>()!;
-        recipes.ToList().ForEach(recipe =>
-        {
-            var rowId = recipe.ItemResult.RowId;
-            if (RecipesByResult.ContainsKey(rowId))
-            {
-                RecipesByResult[rowId].Add(recipe);
-            }
-            else
-            {
-                RecipesByResult.Add(rowId, new List<Recipe>() { recipe });
-            }
-        });
-
-
         SizeConstraints = new WindowSizeConstraints
         {
             MinimumSize = new Vector2(375, 330),
@@ -63,18 +30,8 @@ public class MainWindow : Window, IDisposable
         };
 
 
-        GoatImagePath = goatImagePath;
-        Plugin = plugin;
-
-        unsafe
-        {
-            var playerStatePtr = PlayerState.Instance();
-            playerAttributes = playerStatePtr->Attributes.ToArray();
-        }
-
-        playerAttributeNames = [
-            "??", "Strength", "Dexterity", "Vitality", "Intelligence", "Mind"
-        ];
+        this.goatImagePath = goatImagePath;
+        this.plugin = plugin;
     }
 
     public void Dispose() { }
@@ -114,19 +71,9 @@ public class MainWindow : Window, IDisposable
         //}
     }
 
-    void GetItemInfo()
-    {
-        XIVSocketPlugin.ChatGui.Print("Searching for " + searchItem);
-        var searchItemObj = Items.First(i => i.Name.ToString().Equals(searchItem));
-        XIVSocketPlugin.ChatGui.Print("found " + searchItemObj.Name);
-
-        string itemName = searchItemObj.Name.ExtractText();
-        GetRecipeInfo(searchItemObj.RowId, 0);
-    }
-
     public override void Draw()
     {
-        var netMgr = Plugin.NetworkManager;
+        var netMgr = plugin.NetworkManager;
         if (ImGui.Button((netMgr.SocketRunning() ? "Stop" : "Start") + " Socket"))
         {
             if (netMgr.SocketRunning())
@@ -140,24 +87,24 @@ public class MainWindow : Window, IDisposable
         }
 
         string[] txt = [
-            Plugin.XIVStateManager.GetLocation().region.name,
-            Plugin.XIVStateManager.GetLocation().territory.name,
-            Plugin.XIVStateManager.GetLocation().area.name,
-            Plugin.XIVStateManager.GetLocation().subArea.name
+            plugin.XIVStateManager.GetLocation().region.name,
+            plugin.XIVStateManager.GetLocation().territory.name,
+            plugin.XIVStateManager.GetLocation().area.name,
+            plugin.XIVStateManager.GetLocation().subArea.name
         ];
         ImGui.Text(string.Join(", ", txt.ToList()));
         ImGui.Spacing();
-        ImGui.Text(Plugin.XIVStateManager.GetLocation().ToString());
+        ImGui.Text(plugin.XIVStateManager.GetLocation().ToString());
 
         if (ImGui.Button("Show Settings"))
         {
-            Plugin.ToggleConfigUI();
+            plugin.ToggleConfigUI();
         }
 
         ImGui.Spacing();
 
         ImGui.Text("Have a goat:");
-        var goatImage = XIVSocketPlugin.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+        var goatImage = XIVSocketPlugin.TextureProvider.GetFromFile(goatImagePath).GetWrapOrDefault();
         if (goatImage != null)
         {
             ImGuiHelpers.ScaledIndent(55f);
@@ -167,43 +114,6 @@ public class MainWindow : Window, IDisposable
         else
         {
             ImGui.Text("Image not found.");
-        }
-
-        ImGui.Spacing();
-
-        for (var i = 1; i < playerAttributeNames.Length; i++)
-        {
-            ImGui.Text(playerAttributeNames[i] + ": " + playerAttributes[i]);
-        }
-
-        ImGui.Spacing();
-        ImGui.Spacing();
-        ImGui.Spacing();
-
-        ImGui.Text("Search for an item");
-        ImGui.InputText("", ref searchItem, 100);
-
-        if (ImGui.Button("Get the item"))
-        {
-            GetItemInfo();
-        }
-
-        if (itemName != null)
-        {
-            ImGui.Text(itemName);
-        }
-        else
-        {
-            ImGui.Text("No Item Name");
-        }
-
-        if (itemInfo != null)
-        {
-            ImGui.Text(itemInfo);
-        }
-        else
-        {
-            ImGui.Text("No Item Info");
         }
     }
 }

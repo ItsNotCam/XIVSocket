@@ -10,8 +10,8 @@ namespace XIVSocket.App.Network
         private UDPClient udpClient { get; } = null!;
         private TCPServer tcpServer { get; } = null!;
 
-        private EzRouteHandler ezRouteHandler { get; } = null;
-        private EzWsServer ezWsServer { get; } = null!;
+        private EzRouteHandler ezRouteHandler { get; }
+        private EzWsServer ezWsServer { get; }
 
         private XIVSocketPlugin plugin { get; }
 

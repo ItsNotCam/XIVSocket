@@ -34,10 +34,10 @@ namespace XIVSocket.Lib.Network.Socket
             try {
                 server.Start();
             } catch(HttpListenerException e) {
-                XIVSocketPlugin.PluginLogger.Error($"Error starting server - {e.Message}");
+                XIVSocketPlugin.PluginLogger.Error($"HTTPListener threw an error when starting server - {e.Message}");
                 return;
             } catch(ObjectDisposedException e) {
-                XIVSocketPlugin.PluginLogger.Error($"Error starting server - {e.Message}");
+                XIVSocketPlugin.PluginLogger.Error($"Cannot start server - it has been disposed");
                 return;
             } catch(Exception e) {
                 XIVSocketPlugin.PluginLogger.Error($"Unknown error when starting server - {e.Message}");
@@ -81,19 +81,22 @@ namespace XIVSocket.Lib.Network.Socket
             var buffer = new byte[1024];
             while (socket.State == WebSocketState.Open && !cancellationToken.Token.IsCancellationRequested)
             {
-                WebSocketReceiveResult result;
+                WebSocketReceiveResult? result = null;
                 try {
                     result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken.Token);
-                } catch(Exception e) {
-                    if(e is WebSocketException WebSocketException) {
-                        if(WebSocketException.ErrorCode == 10054) {
-                            XIVSocketPlugin.PluginLogger.Info("Client disconnected");
-                        } else {
-                            XIVSocketPlugin.PluginLogger.Error($"Error receiving message - {WebSocketException.InnerException!.Message}");
-                        }
+                } catch(WebSocketException e) {
+                    if (e.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely) {
+                        XIVSocketPlugin.PluginLogger.Info("Client disconnected");
                     } else {
                         XIVSocketPlugin.PluginLogger.Error($"Error receiving message - {e.Message}");
                     }
+                } catch (OperationCanceledException e) {
+                    XIVSocketPlugin.PluginLogger.Info("Operation cancelled");
+                } catch (Exception e) {
+                    XIVSocketPlugin.PluginLogger.Error($"Error receiving message - {e.Message}");
+                }
+
+                if(result == null) {
                     break;
                 }
 
@@ -132,23 +135,13 @@ namespace XIVSocket.Lib.Network.Socket
             }
         }
 
-        public async void Dispose()
+        public void Dispose()
         {
             try {
                 cancellationToken.Cancel();
             } catch(Exception e) {
                 XIVSocketPlugin.PluginLogger.Error($"Error cancelling token - {e.Message}");
             }
-
-            //foreach (var client in clients) { 
-            //    try {
-            //        await client.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, "", CancellationToken.None);
-            //    } catch (Exception e) {
-            //        XIVSocketPlugin.PluginLogger.Error($"Error closing client - {e.Message}");
-            //    } finally {
-            //        client.Dispose();
-            //    }
-            //}
 
             clients.Clear();
 
