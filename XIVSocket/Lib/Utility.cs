@@ -18,7 +18,7 @@ namespace XIVSocket.App
         {
             if (OperatingSystem.IsWindowsVersionAtLeast(7))
             {
-                return Plugin.DataManager.GetExcelSheet<T>();
+                return XIVSocketPlugin.DataManager.GetExcelSheet<T>();
             }
             return null;
         }

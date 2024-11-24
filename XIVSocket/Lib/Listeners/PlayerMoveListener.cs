@@ -2,17 +2,17 @@
 using Windows.UI.ApplicationSettings;
 using XIVEvents;
 using XIVEvents.Events.Location;
+using XIVEvents.Interfaces;
 using XIVEvents.Models;
-using XIVEvents.Pollers;
 
 namespace XIVSocket.Lib.Listeners;
 
 internal class PlayerMoveListener : IListener
 {
-    Plugin plugin;
+    XIVSocketPlugin plugin;
     //private static Mutex mut = new Mutex();
 
-    public PlayerMoveListener(Plugin plugin) { 
+    public PlayerMoveListener(XIVSocketPlugin plugin) { 
         this.plugin = plugin;
     }
 
@@ -20,7 +20,7 @@ internal class PlayerMoveListener : IListener
     public void OnPlayerMove(PlayerMoveEvent e)
     {
         var message = $"M: {e.NewLocation.position.ToString()}";
-        Plugin.PluginLogger.Verbose(message);
+        XIVSocketPlugin.PluginLogger.Verbose(message);
         //plugin.NetworkManager.SendUdpMessage(message);
 
         plugin.NetworkManager.SendMovementMessage(e.NewLocation);
@@ -41,7 +41,7 @@ internal class PlayerMoveListener : IListener
             message += $"{oldTerritory.name} -> {newTerritory.name}";
         }
 
-        Plugin.PluginLogger.Info(message);
+        XIVSocketPlugin.PluginLogger.Info(message);
         //plugin.NetworkManager.SendUdpMessage(message);
 
         //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
@@ -62,7 +62,7 @@ internal class PlayerMoveListener : IListener
             message += $"{oldSubArea.name} -> {newSubArea.name}";
         }
 
-        Plugin.PluginLogger.Info(message);
+        XIVSocketPlugin.PluginLogger.Info(message);
         //plugin.NetworkManager.SendUdpMessage(message);
 
         //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
@@ -83,7 +83,7 @@ internal class PlayerMoveListener : IListener
             message += $"{oldRegion.name} -> {newRegion.name}";
         }
 
-        Plugin.PluginLogger.Info(message);
+        XIVSocketPlugin.PluginLogger.Info(message);
         //plugin.NetworkManager.SendUdpMessage(message);
 
         //plugin.NetworkManager.SendMovementMessage(e.NewLocation);
@@ -104,7 +104,7 @@ internal class PlayerMoveListener : IListener
             message += $"{oldArea.name} -> {newArea.name}";
         }
 
-        Plugin.PluginLogger.Info(message);
+        XIVSocketPlugin.PluginLogger.Info(message);
         //plugin.NetworkManager.SendUdpMessage(message);
 
         //plugin.NetworkManager.SendMovementMessage(e.NewLocation);

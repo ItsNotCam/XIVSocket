@@ -32,22 +32,22 @@ namespace XIVSocket.App.Logging
         {
             switch(logLevel) {
                 case LogLevel.DEBUG:
-                    Plugin.PluginLogger.Debug(message);
+                    XIVSocketPlugin.PluginLogger.Debug(message);
                     break;
                 case LogLevel.INFO:
-                    Plugin.PluginLogger.Info(message);
+                    XIVSocketPlugin.PluginLogger.Info(message);
                     break;
                 case LogLevel.WARN:
-                    Plugin.PluginLogger.Warning(message);
+                    XIVSocketPlugin.PluginLogger.Warning(message);
                     break;
                 case LogLevel.ERROR:
-                    Plugin.PluginLogger.Error(message);
+                    XIVSocketPlugin.PluginLogger.Error(message);
                     break;
                 case LogLevel.FATAL:
-                    Plugin.PluginLogger.Fatal(message);
+                    XIVSocketPlugin.PluginLogger.Fatal(message);
                     break;
                 case LogLevel.VERBOSE:
-                    Plugin.PluginLogger.Verbose(message);
+                    XIVSocketPlugin.PluginLogger.Verbose(message);
                     break;
             }
 

@@ -13,7 +13,7 @@ using XIVEvents.Models;
 
 namespace XIVSocket;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed class XIVSocketPlugin : IDalamudPlugin
 {
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
@@ -37,9 +37,8 @@ public sealed class Plugin : IDalamudPlugin
 
     public NetworkManager NetworkManager { get; }
     public XIVStateManager XIVStateManager { get; }
-    public Logger Logger { get; }
 
-    public Plugin(IDalamudPluginInterface pluginInterface)
+    public XIVSocketPlugin(IDalamudPluginInterface pluginInterface)
     {
         pluginInterface.Create<Services>();
 
