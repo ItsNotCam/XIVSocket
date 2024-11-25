@@ -3,7 +3,7 @@ using System.Text;
 
 namespace XIVSocket.Lib.Network.Socket
 {
-    internal struct EzDeserializedPacket
+    internal struct EzPacket
     {
         public uint id { get; set; }
         public uint flag { get; set; }
@@ -14,7 +14,7 @@ namespace XIVSocket.Lib.Network.Socket
 	{
         static int EZ = (int) EzFlag.EZ;
 
-		public static EzDeserializedPacket Deserialize(byte[] msg)
+		public static EzPacket Deserialize(byte[] msg)
 		{
 			// These primitive types are represented by integers in C#  
 			int packetLength;
@@ -46,7 +46,7 @@ namespace XIVSocket.Lib.Network.Socket
 
 			Console.WriteLine("Received: " + id + ", " + flag + ", " + Encoding.UTF8.GetString(payload));
 
-			return new EzDeserializedPacket
+			return new EzPacket
 			{
 				id = (uint)id,
 				flag = (uint)flag,
@@ -56,7 +56,7 @@ namespace XIVSocket.Lib.Network.Socket
 
 		public static byte[] Serialize(int routeFlag, byte[] data, int id = 0)
 		{
-			int bId = id & 0x3FF;                                 // 10b 	- ID  
+			var bId = id & 0x3FF;                                 // 10b 	- ID  
 			byte[] bPayload = Truncate1024B(data);                // 1024B 	- Payload truncated to 1024 bytes  
 			int bPacketLength = (4 + bPayload.Length) & 0x3FF;    // 10b 	- Packet length  
 

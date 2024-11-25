@@ -17,13 +17,15 @@ internal class EzRouteHandler
         switch (flag)
         {
             case EzFlag.JOB_MAIN:
-                var result = HandleGetJobMain();
-                return result;
+                var mainJobStr = HandleGetJobMain();
+                return mainJobStr;
+            case EzFlag.TIME:
+                var gameTime = HandleGetGameTime();
+                return gameTime;
         }
 
         return null;
     }
-
     private string? HandleGetJobMain()
     {
         JobModel? job = null;
@@ -47,4 +49,6 @@ internal class EzRouteHandler
 
         return result;
     }
+    
+    private string? HandleGetGameTime() => plugin.XIVStateManager.GetGameTime();
 }

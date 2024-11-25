@@ -70,7 +70,7 @@ namespace XIVSocket.Lib.Network
                             continue;
                         }
 
-                        EzDeserializedPacket packet = EzSerDe.Deserialize(msg);
+                        EzPacket packet = EzSerDe.Deserialize(msg);
                         string message = Encoding.UTF8.GetString(packet.payload);
                         uint id = packet.id;
                         uint flag = packet.flag;
