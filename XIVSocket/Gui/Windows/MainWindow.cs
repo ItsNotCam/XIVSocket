@@ -87,10 +87,10 @@ public class MainWindow : Window, IDisposable
         }
 
         string[] txt = [
-            plugin.XIVStateManager.GetLocation().region.name,
-            plugin.XIVStateManager.GetLocation().territory.name,
-            plugin.XIVStateManager.GetLocation().area.name,
-            plugin.XIVStateManager.GetLocation().subArea.name
+            plugin.XIVStateManager.GetLocation().Region.name,
+            plugin.XIVStateManager.GetLocation().Territory.name,
+            plugin.XIVStateManager.GetLocation().Area.name,
+            plugin.XIVStateManager.GetLocation().SubArea.name
         ];
         ImGui.Text(string.Join(", ", txt.ToList()));
         ImGui.Spacing();

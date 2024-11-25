@@ -29,8 +29,8 @@ internal class PlayerMoveListener : IListener
     [EventListener]
     public void OnPlayerChangeTerritory(PlayerChangeTerritoryEvent e)
     {
-        PlaceModel oldTerritory = e.OldLocation.territory;
-        PlaceModel newTerritory = e.NewLocation.territory;
+        PlaceModel oldTerritory = e.OldLocation.Territory;
+        PlaceModel newTerritory = e.NewLocation.Territory;
 
         string message = "T: ";
         if (oldTerritory.name == null || oldTerritory.name.Length < 1) {
@@ -50,8 +50,8 @@ internal class PlayerMoveListener : IListener
     [EventListener]
     public void OnPlayerChangeSubArea(PlayerChangeSubAreaEvent e)
     {
-        PlaceModel oldSubArea = e.OldLocation.subArea;
-        PlaceModel newSubArea = e.NewLocation.subArea;
+        PlaceModel oldSubArea = e.OldLocation.SubArea;
+        PlaceModel newSubArea = e.NewLocation.SubArea;
 
         string message = "S: ";
         if (oldSubArea.name == null || oldSubArea.name.Length < 1) {
@@ -71,8 +71,8 @@ internal class PlayerMoveListener : IListener
     [EventListener]
     public void OnPlayerChangeRegion(PlayerChangeRegionEvent e)
     {
-        PlaceModel oldRegion = e.OldLocation.region;
-        PlaceModel newRegion = e.NewLocation.region;
+        PlaceModel oldRegion = e.OldLocation.Region;
+        PlaceModel newRegion = e.NewLocation.Region;
 
         string message = "R: ";
         if (oldRegion.name == null || oldRegion.name.Length < 1) {
@@ -92,8 +92,8 @@ internal class PlayerMoveListener : IListener
     [EventListener]
     public void OnPlayerChangeArea(PlayerChangeAreaEvent e)
     {
-        PlaceModel oldArea = e.OldLocation.area;
-        PlaceModel newArea = e.NewLocation.area;
+        PlaceModel oldArea = e.OldLocation.Area;
+        PlaceModel newArea = e.NewLocation.Area;
 
         string message = "A: ";
         if (oldArea.name == null || oldArea.name.Length < 1) {
